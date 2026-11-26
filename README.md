@@ -44,7 +44,17 @@ Some antivirus programs may flag `ShareWatch.exe` as suspicious. An older versio
 - it reads SMB sessions and can disconnect computers;
 - it can add a Windows Firewall rule.
 
-On the author's PC, **Bitdefender Antivirus Plus** does not flag it. If your antivirus does:
+On VirusTotal (version 0.6.2, November 2026), 5 engines flag it. All 5 results come from machine-learning or heuristic analysis, not from a known malware signature:
+
+| Engine | Result |
+|---|---|
+| Bkav Pro | W32.Malware.D226EE45 |
+| Elastic | Malicious (high Confidence) |
+| SecureAge | Malicious |
+| Symantec | ML.Attribute.HighConfidence |
+| Trapmine | Suspicious.low.ml.score |
+
+The other engines, for example Acronis (Static ML), report it as clean. On the author's PC, **Bitdefender Antivirus Plus** does not flag it either. If your antivirus does:
 
 1. Read the source code. It is all in this repository, with no external libraries.
 2. Build the executable yourself with `.\build.ps1` (see below) instead of downloading it.

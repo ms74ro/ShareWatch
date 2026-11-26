@@ -44,7 +44,17 @@ Unele programe antivirus pot semnala `ShareWatch.exe` ca suspect. O versiune mai
 - citește sesiunile SMB și poate deconecta calculatoare;
 - poate adăuga o regulă în Windows Firewall.
 
-Pe PC-ul autorului, **Bitdefender Antivirus Plus** nu o semnalează. Dacă antivirusul tău o face:
+Pe VirusTotal (versiunea 0.6.2, noiembrie 2026), 5 motoare o semnalează. Toate cele 5 rezultate vin din analiză euristică sau de tip machine learning, nu din semnătura unui virus cunoscut:
+
+| Motor | Rezultat |
+|---|---|
+| Bkav Pro | W32.Malware.D226EE45 |
+| Elastic | Malicious (high Confidence) |
+| SecureAge | Malicious |
+| Symantec | ML.Attribute.HighConfidence |
+| Trapmine | Suspicious.low.ml.score |
+
+Celelalte motoare, de exemplu Acronis (Static ML), o raportează ca fiind curată. Nici **Bitdefender Antivirus Plus**, pe PC-ul autorului, nu o semnalează. Dacă antivirusul tău o face:
 
 1. Citește codul sursă. Este tot în acest depozit, fără biblioteci externe.
 2. Compilează singur executabilul cu `.\build.ps1` (vezi mai jos), în loc să-l descarci.
