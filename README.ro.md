@@ -6,6 +6,20 @@ ShareWatch este o aplicație mică pentru Windows, în tray, care te anunță c�
 
 Este un singur executabil, fără instalare și fără alte dependențe în afară de ce vine cu Windows (.NET Framework 4).
 
+![Tabul Monitorizare](docs/screenshots/ro/monitor.png)
+
+## Capturi de ecran
+
+Exemplele de mai jos folosesc tema luminoasă și date fictive.
+
+| | |
+|---|---|
+| **Notificare** | ![Notificare](docs/screenshots/ro/toast.png) |
+| **Foldere monitorizate** | ![Foldere monitorizate](docs/screenshots/ro/folders.png) |
+| **Istoric** | ![Istoric](docs/screenshots/ro/history.png) |
+| **Opțiuni** | ![Opțiuni](docs/screenshots/ro/options.png) |
+| **Despre** | ![Despre](docs/screenshots/ro/about.png) |
+
 ## Funcții
 
 - **Notificări în timp real** când un calculator se conectează la un folder partajat, cu IP și nume, sunet discret opțional și durată configurabilă.
@@ -41,6 +55,14 @@ Nu e nevoie de Visual Studio. Scriptul folosește `csc.exe` din .NET Framework 4
 
 `.\build.ps1 -Test` creează `ShareWatch-test.exe` fără manifestul de administrator, doar pentru testarea interfeței.
 
+Capturile din README provin din varianta de test, cu partajări, calculatoare și jurnal fictive (codul e în `Demo.cs`, compilat doar în varianta de test). Pune exe-ul de test într-un folder cu un `sharewatch.ini` care conține `theme=1` și `lang=1` (sau `lang=2` pentru engleză), apoi rulează:
+
+```powershell
+.\ShareWatch-test.exe --screenshots .\capturi
+```
+
+Salvează câte un PNG pentru fiecare tab și pentru notificare, apoi se închide.
+
 ## Fișiere
 
 | Fișier | Conținut |
@@ -53,6 +75,7 @@ Nu e nevoie de Visual Studio. Scriptul folosește `csc.exe` din .NET Framework 4
 | `BlockList.cs` | Lista de blocare |
 | `Firewall.cs` | Regula din Windows Firewall |
 | `Support.cs` | Traduceri și funcții ajutătoare |
+| `Demo.cs` | Date fictive și capturi (doar în varianta de test) |
 | `build.ps1` | Scriptul de compilare |
 
 ## Modificări

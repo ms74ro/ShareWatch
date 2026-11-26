@@ -202,7 +202,7 @@ namespace ShareWatch
 
             SystemEvents.UserPreferenceChanged += OnSysPrefs;
 
-            Logger.Raw(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + " | START       | ShareWatch " + AppInfo.Version + " pornit pe " + Environment.MachineName
+            Logger.Raw(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + " | START       | ShareWatch " + AppInfo.Version + " pornit pe " + AppInfo.Machine
                 + (IsAdmin() ? "" : " (FARA drepturi de administrator)"));
 
             Monitor = new Monitor(this);
@@ -215,6 +215,9 @@ namespace ShareWatch
 
             if (demo) TestToast();
             if (!startHidden) ShowMain();
+#if TEST
+            if (Demo.On) Demo.Run(delegate { return main; }, Quit);
+#endif
         }
 
         void OnSysPrefs(object sender, UserPreferenceChangedEventArgs e)
@@ -225,6 +228,9 @@ namespace ShareWatch
 
         public static bool IsAdmin()
         {
+#if TEST
+            if (Demo.On) return true;
+#endif
             return new WindowsPrincipal(WindowsIdentity.GetCurrent()).IsInRole(WindowsBuiltInRole.Administrator);
         }
 

@@ -32,8 +32,20 @@ namespace ShareWatch
         public const string Version = "0.6.2";
         // Istoricul versiunilor e in CHANGELOG.md (nu mai e inclus in exe).
         // Cand proiectul ajunge pe GitHub, pune aici adresa fisierului; daca e completata, linkul din Despre o foloseste.
-        public const string ChangelogUrl = "";
+        public const string ChangelogUrl = "https://github.com/ms74ro/ShareWatch/blob/main/CHANGELOG.md";
         public const string ChangelogFile = "CHANGELOG.md";
+
+        // numele acestui calculator (in modul de capturi pentru README: un nume fictiv)
+        public static string Machine
+        {
+            get
+            {
+#if TEST
+                if (Demo.On) return Demo.Machine;
+#endif
+                return Environment.MachineName;
+            }
+        }
     }
 
     static class Program
@@ -43,6 +55,7 @@ namespace ShareWatch
         {
 #if TEST
             const string suffix = "_Test";   // varianta de test nu se loveste de instanta normala
+            Demo.Init(args);
 #else
             const string suffix = "";
 #endif
@@ -276,6 +289,9 @@ namespace ShareWatch
 
         public static List<ShareItem> Shares(out int err)
         {
+#if TEST
+            if (Demo.On) { err = 0; return Demo.Shares(); }
+#endif
             List<ShareItem> res = new List<ShareItem>();
             IntPtr buf; int read, total, resume = 0;
             err = NetShareEnum(null, 2, out buf, -1, out read, out total, ref resume);
@@ -320,6 +336,9 @@ namespace ShareWatch
 
         public static List<CONNECTION_INFO_1> Connections(string share, out int err)
         {
+#if TEST
+            if (Demo.On) { err = 0; return Demo.Connections(share); }
+#endif
             IntPtr buf; int read, total, resume = 0;
             err = NetConnectionEnum(null, share, 1, out buf, -1, out read, out total, ref resume);
             if (err != 0 && err != 234) return null;
@@ -400,6 +419,9 @@ namespace ShareWatch
         // toate sesiunile SMB (inclusiv cele doar pe IPC$), indiferent de partajare
         public static List<SESSION_INFO_10> Sessions(out int err)
         {
+#if TEST
+            if (Demo.On) { err = 0; return new List<SESSION_INFO_10>(); }
+#endif
             IntPtr buf; int read, total, resume = 0;
             err = NetSessionEnum(null, null, null, 10, out buf, -1, out read, out total, ref resume);
             if (err != 0 && err != 234) return null;
@@ -409,6 +431,9 @@ namespace ShareWatch
 
         public static List<FILE_INFO_3> Files(out int err)
         {
+#if TEST
+            if (Demo.On) { err = 0; return Demo.Files(); }
+#endif
             IntPtr buf; int read, total; IntPtr resume = IntPtr.Zero;
             err = NetFileEnum(null, null, null, 3, out buf, -1, out read, out total, ref resume);
             if (err != 0 && err != 234) return null;
@@ -438,6 +463,9 @@ namespace ShareWatch
         public static bool IsLocal(Peer p)
         {
             if (p == null) return false;
+#if TEST
+            if (Demo.On) return false;
+#endif
             if (localIps.Contains(p.Ip)) return true;
             return string.Equals(p.Host, Environment.MachineName, StringComparison.OrdinalIgnoreCase);
         }
@@ -484,6 +512,9 @@ namespace ShareWatch
 
         static Peer Resolve(string raw)
         {
+#if TEST
+            if (Demo.On) return Demo.Resolve(raw);
+#endif
             string s = raw.TrimStart('\\').Trim();
             string ip = null, host = null;
             IPAddress a;

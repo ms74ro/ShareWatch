@@ -6,6 +6,20 @@ ShareWatch is a small Windows tray app that tells you when another computer on t
 
 It is a single executable with no installer and no dependencies beyond what ships with Windows (.NET Framework 4).
 
+![Monitoring tab](docs/screenshots/en/monitor.png)
+
+## Screenshots
+
+The examples below use the light theme and made-up data.
+
+| | |
+|---|---|
+| **Notification** | ![Notification](docs/screenshots/en/toast.png) |
+| **Monitored folders** | ![Monitored folders](docs/screenshots/en/folders.png) |
+| **History** | ![History](docs/screenshots/en/history.png) |
+| **Options** | ![Options](docs/screenshots/en/options.png) |
+| **About** | ![About](docs/screenshots/en/about.png) |
+
 ## Features
 
 - **Live notifications** when a computer connects to a shared folder, with IP and computer name, optional subtle sound and configurable duration.
@@ -41,6 +55,14 @@ No Visual Studio needed. The script uses `csc.exe` from .NET Framework 4, which 
 
 `.\build.ps1 -Test` builds `ShareWatch-test.exe` without the administrator manifest, for testing the interface only.
 
+The README screenshots come from the test build with made-up shares, computers and log entries (code in `Demo.cs`, compiled only into the test build). Put the test exe in a folder with a `sharewatch.ini` containing `theme=1` and `lang=2` (or `lang=1` for Romanian), then run:
+
+```powershell
+.\ShareWatch-test.exe --screenshots .\shots
+```
+
+It saves one PNG per tab plus the notification, then exits.
+
 ## Files
 
 | File | Contents |
@@ -53,6 +75,7 @@ No Visual Studio needed. The script uses `csc.exe` from .NET Framework 4, which 
 | `BlockList.cs` | Block list |
 | `Firewall.cs` | Windows Firewall rule |
 | `Support.cs` | Translations and helpers |
+| `Demo.cs` | Made-up data and screenshots (test build only) |
 | `build.ps1` | Build script |
 
 ## Changes

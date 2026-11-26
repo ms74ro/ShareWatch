@@ -39,6 +39,7 @@ $args += (Join-Path $here 'Support.cs')
 $args += (Join-Path $here 'ShareDialog.cs')
 $args += (Join-Path $here 'BlockList.cs')
 $args += (Join-Path $here 'Firewall.cs')
+if ($Test) { $args += (Join-Path $here 'Demo.cs') }
 & $csc @args
 if ($LASTEXITCODE -ne 0) { throw "Compilare esuata" }
 Get-Item (Join-Path $here $out) | Select-Object Name, Length, @{n='Versiune';e={$_.VersionInfo.FileVersion}}

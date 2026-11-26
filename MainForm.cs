@@ -236,7 +236,7 @@ namespace ShareWatch
         }
 
         // ------------------------------------------------------------ utilitare
-        void SelectTab(int i)
+        public void SelectTab(int i)
         {
             if (i < 0 || i >= pages.Count) i = 0;
             current = i;
@@ -977,7 +977,7 @@ namespace ShareWatch
             Label info = new Label
             {
                 AutoSize = true, Margin = new Padding(3, 6, 3, 6),
-                Text = L.T("Calculator: ") + Environment.MachineName + "\r\n" +
+                Text = L.T("Calculator: ") + AppInfo.Machine + "\r\n" +
                        L.T("Drepturi de administrator: ") + (TrayApp.IsAdmin() ? L.T("da") : L.T("NU (monitorizarea nu va funcționa)")) + "\r\n" +
                        L.T("Jurnal: ") + Settings.LogPath + "\r\n" +
                        L.T("Executabil: ") + Application.ExecutablePath

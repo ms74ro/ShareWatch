@@ -117,7 +117,7 @@ namespace ShareWatch
             {
                 int x = S(24);
                 g.DrawString(blocked ? L.T("CONEXIUNE BLOCATĂ") : L.T("ACCES LA FOLDER PARTAJAT"), f1, acc, x, S(12));
-                g.DrawString(blocked ? L.T("Calculator din lista de blocare") : "\\\\" + Environment.MachineName + "\\" + share, f2, bMain, x - 2, S(32));
+                g.DrawString(blocked ? L.T("Calculator din lista de blocare") : "\\\\" + AppInfo.Machine + "\\" + share, f2, bMain, x - 2, S(32));
                 g.DrawString(L.T("PC: ") + pc + "      IP: " + ip, f3, bSub, x, S(76));
                 g.DrawString(L.T("Utilizator: ") + (string.IsNullOrEmpty(user) ? "-" : user) + "      " + DateTime.Now.ToString("HH:mm:ss"), f4, bDim, x, S(108));
                 if (!string.IsNullOrEmpty(path))
