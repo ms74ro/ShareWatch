@@ -6,19 +6,9 @@ ShareWatch este o aplicație mică pentru Windows, în tray, care te anunță c�
 
 Este un singur executabil, fără instalare și fără alte dependențe în afară de ce vine cu Windows (.NET Framework 4).
 
-![Tabul Monitorizare](docs/screenshots/ro/monitor.png)
+![Tabul Monitorizare](docs/screenshots/en/monitor.png)
 
-## Capturi de ecran
-
-Exemplele de mai jos folosesc tema luminoasă și date fictive.
-
-| | |
-|---|---|
-| **Notificare** | ![Notificare](docs/screenshots/ro/toast.png) |
-| **Foldere monitorizate** | ![Foldere monitorizate](docs/screenshots/ro/folders.png) |
-| **Istoric** | ![Istoric](docs/screenshots/ro/history.png) |
-| **Opțiuni** | ![Opțiuni](docs/screenshots/ro/options.png) |
-| **Despre** | ![Despre](docs/screenshots/ro/about.png) |
+Alte capturi (în engleză și română, temă luminoasă, date fictive) sunt în [docs/screenshots](docs/screenshots).
 
 ## Funcții
 

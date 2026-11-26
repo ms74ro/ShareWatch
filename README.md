@@ -8,17 +8,7 @@ It is a single executable with no installer and no dependencies beyond what ship
 
 ![Monitoring tab](docs/screenshots/en/monitor.png)
 
-## Screenshots
-
-The examples below use the light theme and made-up data.
-
-| | |
-|---|---|
-| **Notification** | ![Notification](docs/screenshots/en/toast.png) |
-| **Monitored folders** | ![Monitored folders](docs/screenshots/en/folders.png) |
-| **History** | ![History](docs/screenshots/en/history.png) |
-| **Options** | ![Options](docs/screenshots/en/options.png) |
-| **About** | ![About](docs/screenshots/en/about.png) |
+More screenshots (English and Romanian, light theme, made-up data) are in [docs/screenshots](docs/screenshots).
 
 ## Features
 
