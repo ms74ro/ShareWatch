@@ -1,0 +1,12 @@
+# build output
+*.exe
+app.ico
+
+# arhive cu versiuni vechi
+versiuni/
+
+# date locale ale aplicatiei
+sharewatch.ini
+acces_foldere.log
+blocklist.txt
+*.log
