@@ -71,3 +71,7 @@ It saves one PNG per tab plus the notification, then exits.
 ## Changes
 
 See [CHANGELOG.md](CHANGELOG.md).
+
+## License
+
+[MIT](LICENSE) © 2026 ms74ro

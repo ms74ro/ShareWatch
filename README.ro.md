@@ -71,3 +71,7 @@ Salvează câte un PNG pentru fiecare tab și pentru notificare, apoi se închid
 ## Modificări
 
 Vezi [CHANGELOG.md](CHANGELOG.md) (în engleză).
+
+## Licență
+
+[MIT](LICENSE) © 2026 ms74ro. Poți folosi, modifica și redistribui aplicația liber, inclusiv comercial, cu condiția să păstrezi mențiunea de copyright și textul licenței. Aplicația este oferită fără nicio garanție.
