@@ -35,6 +35,27 @@ More screenshots (English and Romanian, light theme, made-up data) are in [docs/
 
 Settings are saved in `sharewatch.ini` next to the executable (or in `%LOCALAPPDATA%\ShareWatch` if that folder is not writable).
 
+## Antivirus warnings
+
+Some antivirus programs may flag `ShareWatch.exe` as suspicious. An older version was flagged by at least one antivirus. This is a false positive: heuristic scanners react to what the app needs to do, together with the fact that the executable is small, new and not digitally signed:
+
+- it asks for administrator rights and starts with Windows through a scheduled task;
+- it runs hidden in the tray;
+- it reads SMB sessions and can disconnect computers;
+- it can add a Windows Firewall rule.
+
+On the author's PC, **Bitdefender Antivirus Plus** does not flag it. If your antivirus does:
+
+1. Read the source code. It is all in this repository, with no external libraries.
+2. Build the executable yourself with `.\build.ps1` (see below) instead of downloading it.
+3. Or check that the downloaded file matches the one in the release. The release notes give its SHA-256. Compare it with:
+
+   ```powershell
+   Get-FileHash .\ShareWatch.exe -Algorithm SHA256
+   ```
+
+4. You can scan the file on [VirusTotal](https://www.virustotal.com) and report the false positive to your antivirus vendor.
+
 ## Building
 
 No Visual Studio needed. The script uses `csc.exe` from .NET Framework 4, which is part of Windows:

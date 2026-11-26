@@ -35,6 +35,27 @@ Alte capturi (în engleză și română, temă luminoasă, date fictive) sunt î
 
 Setările se salvează în `sharewatch.ini` lângă executabil (sau în `%LOCALAPPDATA%\ShareWatch` dacă folderul nu permite scrierea).
 
+## Alerte antivirus
+
+Unele programe antivirus pot semnala `ShareWatch.exe` ca suspect. O versiune mai veche a fost semnalată de cel puțin un antivirus. Este o alertă falsă: scanerele euristice reacționează la ce trebuie să facă aplicația, plus faptul că executabilul e mic, nou și nesemnat digital:
+
+- cere drepturi de administrator și pornește cu Windows printr-o sarcină programată;
+- rulează ascuns, în tray;
+- citește sesiunile SMB și poate deconecta calculatoare;
+- poate adăuga o regulă în Windows Firewall.
+
+Pe PC-ul autorului, **Bitdefender Antivirus Plus** nu o semnalează. Dacă antivirusul tău o face:
+
+1. Citește codul sursă. Este tot în acest depozit, fără biblioteci externe.
+2. Compilează singur executabilul cu `.\build.ps1` (vezi mai jos), în loc să-l descarci.
+3. Sau verifică dacă fișierul descărcat este cel din release. Amprenta SHA-256 e trecută în notele release-ului. Compar-o cu:
+
+   ```powershell
+   Get-FileHash .\ShareWatch.exe -Algorithm SHA256
+   ```
+
+4. Poți scana fișierul pe [VirusTotal](https://www.virustotal.com) și poți raporta alerta falsă producătorului antivirusului.
+
 ## Compilare
 
 Nu e nevoie de Visual Studio. Scriptul folosește `csc.exe` din .NET Framework 4, inclus în Windows:
