@@ -72,6 +72,11 @@ It saves one PNG per tab plus the notification, then exits.
 
 See [CHANGELOG.md](CHANGELOG.md).
 
+## Contributors
+
+- [ms74ro](https://github.com/ms74ro) — author
+- [Claude](https://claude.com/claude-code) (Anthropic) — code and documentation, working with ms74ro
+
 ## License
 
-[MIT](LICENSE) © 2026 ms74ro
+[MIT](LICENSE) © 2026 ms74ro. A Romanian translation, for information only, is in [LICENTA.md](LICENTA.md).

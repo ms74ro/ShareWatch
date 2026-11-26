@@ -72,6 +72,11 @@ Salvează câte un PNG pentru fiecare tab și pentru notificare, apoi se închid
 
 Vezi [CHANGELOG.md](CHANGELOG.md) (în engleză).
 
+## Contributori
+
+- [ms74ro](https://github.com/ms74ro) — autor
+- [Claude](https://claude.com/claude-code) (Anthropic) — cod și documentație, împreună cu ms74ro
+
 ## Licență
 
-[MIT](LICENSE) © 2026 ms74ro. Poți folosi, modifica și redistribui aplicația liber, inclusiv comercial, cu condiția să păstrezi mențiunea de copyright și textul licenței. Aplicația este oferită fără nicio garanție.
+[MIT](LICENSE) © 2026 ms74ro ([traducerea în română](LICENTA.md), doar informativă). Poți folosi, modifica și redistribui aplicația liber, inclusiv comercial, cu condiția să păstrezi mențiunea de copyright și textul licenței. Aplicația este oferită fără nicio garanție.
