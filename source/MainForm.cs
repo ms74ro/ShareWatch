@@ -18,7 +18,7 @@ namespace ShareWatch
         static Font iconFont;
 
         // font de iconite din Windows: Segoe Fluent Icons (Win 11) sau Segoe MDL2 Assets (Win 10)
-        static Font IconFont()
+        internal static Font IconFont()
         {
             if (iconFont != null) return iconFont;
             foreach (string n in new string[] { "Segoe Fluent Icons", "Segoe MDL2 Assets" })
@@ -67,6 +67,59 @@ namespace ShareWatch
             if (Selected)
                 using (SolidBrush b = new SolidBrush(Theme.Accent))
                     g.FillRectangle(b, 0, Height - bar, Width, bar);
+        }
+    }
+
+    // iconita clicabila langa un link (Despre): sigla GitHub sau o glifa din fontul de iconite
+    class LinkIcon : Control
+    {
+        // sigla GitHub (Octicons mark-github, MIT), 16x16, curbe Bezier continue
+        static readonly float[] GitHubMark = {
+            6.766f, 11.328f, 4.703f, 11.078f, 3.250f, 9.594f, 3.250f, 7.672f, 3.250f, 6.891f, 3.531f, 6.047f, 4f, 5.484f,
+            3.797f, 4.969f, 3.828f, 3.875f, 4.063f, 3.422f, 4.688f, 3.344f, 5.531f, 3.672f, 6.031f, 4.125f, 6.625f,
+            3.938f, 7.250f, 3.844f, 8.016f, 3.844f, 8.781f, 3.844f, 9.406f, 3.938f, 9.969f, 4.109f, 10.453f, 3.672f,
+            11.313f, 3.344f, 11.938f, 3.422f, 12.156f, 3.844f, 12.188f, 4.937f, 11.984f, 5.469f, 12.484f, 6.062f, 12.750f,
+            6.859f, 12.750f, 7.672f, 12.750f, 9.594f, 11.297f, 11.047f, 9.203f, 11.312f, 9.734f, 11.656f, 10.093f,
+            12.406f, 10.093f, 13.266f, 10.093f, 13.266f, 10.093f, 14.891f, 10.093f, 14.891f, 10.093f, 15.359f, 10.484f,
+            15.625f, 10.953f, 15.438f, 13.781f, 14.359f, 16f, 11.530f, 16f, 8.030f, 16f, 3.610f, 12.406f, 0f, 7.984f, 0f,
+            3.563f, 0f, 0f, 3.610f, 0f, 8.031f, -0.009f, 11.347f, 2.058f, 14.314f, 5.172f, 15.453f, 5.594f, 15.609f, 6f,
+            15.328f, 6f, 14.906f, 6f, 14.906f, 6f, 13.656f, 6f, 13.656f, 5.781f, 13.750f, 5.500f, 13.812f, 5.250f,
+            13.812f, 4.219f, 13.812f, 3.610f, 13.250f, 3.172f, 12.203f, 3f, 11.781f, 2.812f, 11.531f, 2.453f, 11.484f,
+            2.266f, 11.469f, 2.203f, 11.391f, 2.203f, 11.297f, 2.203f, 11.109f, 2.516f, 10.969f, 2.828f, 10.969f, 3.281f,
+            10.969f, 3.672f, 11.250f, 4.078f, 11.829f, 4.391f, 12.281f, 4.718f, 12.484f, 5.109f, 12.484f, 5.500f, 12.484f,
+            5.750f, 12.344f, 6.109f, 11.984f, 6.375f, 11.719f, 6.579f, 11.484f, 6.766f, 11.328f };
+
+        readonly string glyph;   // null = sigla GitHub
+
+        public LinkIcon(string glyph, int size)
+        {
+            this.glyph = glyph;
+            Size = new Size(size, size);
+            Cursor = Cursors.Hand;
+            SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.UserPaint | ControlStyles.SupportsTransparentBackColor, true);
+            BackColor = Color.Transparent;
+        }
+
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            Graphics g = e.Graphics;
+            if (glyph != null)
+            {
+                TextRenderer.DrawText(g, glyph, TabButton.IconFont(), ClientRectangle, Theme.Fg,
+                    TextFormatFlags.NoPadding | TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter);
+                return;
+            }
+            PointF[] pts = new PointF[GitHubMark.Length / 2];
+            float k = Math.Min(Width, Height) / 16f * 0.9f, o = Math.Min(Width, Height) * 0.05f;
+            for (int i = 0; i < pts.Length; i++) pts[i] = new PointF(o + GitHubMark[2 * i] * k, o + GitHubMark[2 * i + 1] * k);
+            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+            using (System.Drawing.Drawing2D.GraphicsPath gp = new System.Drawing.Drawing2D.GraphicsPath())
+            using (SolidBrush b = new SolidBrush(Theme.Fg))
+            {
+                gp.AddBeziers(pts);
+                gp.CloseFigure();
+                g.FillPath(b, gp);
+            }
         }
     }
 
@@ -767,13 +820,18 @@ namespace ShareWatch
             cbLang.Items.AddRange(new object[] { L.T("Automat (ca Windows)"), "Română", "English" });
             langFiles = L.Available();
             foreach (L.LangFile lf in langFiles) cbLang.Items.Add(lf.Name);
-            FlowLayoutPanel r3 = new FlowLayoutPanel { AutoSize = true, WrapContents = false, Margin = new Padding(3, 10, 3, 3) };
-            r3.Controls.Add(new Label { Text = L.T("Temă:"), AutoSize = true, Margin = new Padding(3, S(5), 6, 0) });
-            r3.Controls.Add(cbTheme);
-            FlowLayoutPanel r4 = new FlowLayoutPanel { AutoSize = true, WrapContents = false };
-            r4.Controls.Add(new Label { Text = L.T("Limbă:"), AutoSize = true, Margin = new Padding(3, S(5), 6, 0) });
-            r4.Controls.Add(cbLang);
-            r4.Controls.Add(new Label { Text = L.T("Alte limbi: fișiere language\\xx.json lângă executabil (vezi README)."), AutoSize = true, Tag = "muted", Margin = new Padding(S(10), S(5), 3, 0) });
+            // Tema si Limba intr-un tabel: casetele raman aliniate oricat de lunga e eticheta in limba aleasa
+            TableLayoutPanel r3 = new TableLayoutPanel { AutoSize = true, ColumnCount = 3, RowCount = 2, Margin = new Padding(3, 10, 3, 3) };
+            r3.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+            r3.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+            r3.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+            cbTheme.Margin = new Padding(3, 3, 3, 3);
+            cbLang.Margin = new Padding(3, 3, 3, 3);
+            r3.Controls.Add(new Label { Text = L.T("Temă:"), AutoSize = true, Margin = new Padding(3, S(6), 6, 0) }, 0, 0);
+            r3.Controls.Add(cbTheme, 1, 0);
+            r3.Controls.Add(new Label { Text = L.T("Limbă:"), AutoSize = true, Margin = new Padding(3, S(6), 6, 0) }, 0, 1);
+            r3.Controls.Add(cbLang, 1, 1);
+            r3.Controls.Add(new Label { Text = L.T("Alte limbi: fișiere language\\xx.json lângă executabil (vezi README)."), AutoSize = true, Tag = "muted", Margin = new Padding(S(10), S(6), 3, 0) }, 2, 1);
             chkTrayClick = new CheckBox { Text = L.T("Deschide fereastra cu un singur clic pe iconița din tray"), AutoSize = true, Margin = new Padding(3, 6, 3, 6) };
             chkTrayClick.CheckedChanged += delegate { if (loadingOpt) return; Settings.TrayOneClick = chkTrayClick.Checked; Settings.Save(); };
 
@@ -818,7 +876,7 @@ namespace ShareWatch
             };
             test.Click += delegate { app.TestToast(); };
 
-            p.Controls.AddRange(new Control[] { chkNotify, chkSound, chkLocal, chkHideAdmin, chkAuto, chkTrayClick, r1, r2, r3, r4, test });
+            p.Controls.AddRange(new Control[] { chkNotify, chkSound, chkLocal, chkHideAdmin, chkAuto, chkTrayClick, r1, r2, r3, test });
             BuildBlockList(p);
             p.Controls.Add(note);
             page.Controls.Add(p);
@@ -982,6 +1040,11 @@ namespace ShareWatch
             FlowLayoutPanel title = new FlowLayoutPanel { AutoSize = true, WrapContents = false, Margin = new Padding(0) };
             title.Controls.Add(name);
             title.Controls.Add(by);
+            string logShown = Settings.LogPath, exeShown = Application.ExecutablePath;
+#if TEST
+            // capturi pentru README: cai fictive, nu folderul real din care ruleaza
+            if (Demo.On) { logShown = @"C:\ShareWatch\acces_foldere.log"; exeShown = @"C:\ShareWatch\ShareWatch.exe"; }
+#endif
             Label ver = new Label { Text = L.T("Versiunea ") + AppInfo.Version, AutoSize = true, Font = new Font("Segoe UI", 11f), Margin = new Padding(3, 0, 3, 10) };
             Label desc = new Label
             {
@@ -993,30 +1056,46 @@ namespace ShareWatch
                 AutoSize = true, Margin = new Padding(3, 6, 3, 6),
                 Text = L.T("Calculator: ") + AppInfo.Machine + "\r\n" +
                        L.T("Drepturi de administrator: ") + (TrayApp.IsAdmin() ? L.T("da") : L.T("NU (monitorizarea nu va funcționa)")) + "\r\n" +
-                       L.T("Jurnal: ") + Settings.LogPath + "\r\n" +
-                       L.T("Executabil: ") + Application.ExecutablePath
+                       L.T("Jurnal: ") + logShown + "\r\n" +
+                       L.T("Executabil: ") + exeShown
             };
             p.Controls.AddRange(new Control[] { title, ver, desc, info });
+
+            // pe un rand: [GitHub] adresa aplicatiei, apoi [istoric] Istoric versiuni
+            FlowLayoutPanel links = new FlowLayoutPanel { AutoSize = true, WrapContents = false, Margin = new Padding(0, S(12), 3, 3) };
+            AddLink(links, null, AppInfo.RepoUrl.Replace("https://", ""), AppInfo.RepoUrl, 0);
 
             // istoricul versiunilor: link catre GitHub (daca e configurat) sau catre CHANGELOG.md de langa exe (daca exista)
             string changelogFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, AppInfo.ChangelogFile);
             string target = !string.IsNullOrEmpty(AppInfo.ChangelogUrl) ? AppInfo.ChangelogUrl
                           : File.Exists(changelogFile) ? changelogFile : null;
-            if (target != null)
-            {
-                LinkLabel chg = new LinkLabel { Text = L.T("Istoric versiuni"), AutoSize = true, Margin = new Padding(3, 12, 3, 3), Font = new Font("Segoe UI", 10f) };
-                chg.LinkClicked += delegate
-                {
-                    try { System.Diagnostics.Process.Start(target); }
-                    catch
-                    {
-                        // .md fara aplicatie asociata: il deschidem in Notepad
-                        try { System.Diagnostics.Process.Start("notepad.exe", "\"" + target + "\""); } catch { }
-                    }
-                };
-                p.Controls.Add(chg);
-            }
+            if (target != null) AddLink(links, "", L.T("Istoric versiuni"), target, S(28));
+            p.Controls.Add(links);
             page.Controls.Add(p);
+        }
+
+        // iconita + link (iconita e si ea clicabila)
+        void AddLink(FlowLayoutPanel row, string glyph, string text, string target, int gapBefore)
+        {
+            LinkLabel ll = new LinkLabel { Text = text, AutoSize = true, Font = new Font("Segoe UI", 10f), Margin = new Padding(S(4), 0, 3, 0) };
+            LinkIcon ic = new LinkIcon(glyph, S(20)) { Margin = new Padding(3 + gapBefore, 0, 0, 0) };
+            EventHandler open = delegate
+            {
+                try { System.Diagnostics.Process.Start(target); }
+                catch
+                {
+                    // .md fara aplicatie asociata: il deschidem in Notepad
+                    try { System.Diagnostics.Process.Start("notepad.exe", "\"" + target + "\""); } catch { }
+                }
+            };
+            ll.LinkClicked += delegate { open(null, EventArgs.Empty); };
+            ic.Click += open;
+            // iconita centrata pe verticala fata de text
+            int h = ll.PreferredHeight;
+            if (h > ic.Height) ic.Margin = new Padding(ic.Margin.Left, (h - ic.Height) / 2, 0, 0);
+            else ll.Margin = new Padding(ll.Margin.Left, (ic.Height - h) / 2, 3, 0);
+            row.Controls.Add(ic);
+            row.Controls.Add(ll);
         }
     }
 }

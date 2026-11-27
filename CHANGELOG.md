@@ -2,6 +2,11 @@
 
 All notable changes to ShareWatch are listed here, newest first.
 
+## 0.7.2
+- About: link to the GitHub page, with the GitHub icon, next to the version history link (now with an icon too).
+- Options: the Theme and Language boxes are aligned in every language.
+- The executable's Properties → Details show the GitHub address.
+
 ## 0.7.1
 - Dark theme: the scroll bar in Options (and About) is now dark, like the ones in the lists.
 
