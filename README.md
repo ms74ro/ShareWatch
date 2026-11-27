@@ -30,7 +30,7 @@ More screenshots (English and Romanian, light theme, made-up data) are in [docs/
 
 ## Usage
 
-1. Download `ShareWatch-x.y.z.zip` from [Releases](https://github.com/ms74ro/ShareWatch/releases/latest) and extract it to a folder of your choice. The zip holds `ShareWatch.exe`, the `language` folder and the license. The bare `.exe` is not attached because some browsers' web protection (Bitdefender, for example) blocks downloading it from GitHub.
+1. Download `ShareWatch-x.y.z.zip` from [Releases](https://github.com/ms74ro/ShareWatch/releases/latest) and extract it to a folder of your choice. The zip holds `ShareWatch.exe`, the `language` folder, this README, the changelog, the license and the source code (`source` folder). The bare `.exe` is not attached because some browsers' web protection (Bitdefender, for example) blocks downloading it from GitHub.
 2. Run `ShareWatch.exe` and accept the administrator prompt.
 3. The icon appears in the tray. Double-click it to open the window.
 
@@ -95,6 +95,8 @@ No Visual Studio needed. The script uses `csc.exe` from .NET Framework 4, which 
 ```powershell
 .\build.ps1
 ```
+
+In the release zip the source code is in the `source` folder: run `.\source\build.ps1` and the exe is created there.
 
 `.\build.ps1 -Test` builds `ShareWatch-test.exe` without the administrator manifest, for testing the interface only.
 

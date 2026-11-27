@@ -30,7 +30,7 @@ Alte capturi (în engleză și română, temă luminoasă, date fictive) sunt î
 
 ## Utilizare
 
-1. Descarcă `ShareWatch-x.y.z.zip` din [Releases](https://github.com/ms74ro/ShareWatch/releases/latest) și dezarhivează-l într-un folder la alegere. Arhiva conține `ShareWatch.exe`, folderul `language` și licența. Exe-ul nu mai este atașat separat, pentru că protecția web a unor antivirusuri (de exemplu Bitdefender) îi blochează descărcarea de pe GitHub.
+1. Descarcă `ShareWatch-x.y.z.zip` din [Releases](https://github.com/ms74ro/ShareWatch/releases/latest) și dezarhivează-l într-un folder la alegere. Arhiva conține `ShareWatch.exe`, folderul `language`, acest README, lista de modificări, licența și codul sursă (folderul `source`). Exe-ul nu mai este atașat separat, pentru că protecția web a unor antivirusuri (de exemplu Bitdefender) îi blochează descărcarea de pe GitHub.
 2. Rulează `ShareWatch.exe` și acceptă cererea de administrator.
 3. Iconița apare în tray. Dublu-clic pe ea deschide fereastra.
 
@@ -95,6 +95,8 @@ Nu e nevoie de Visual Studio. Scriptul folosește `csc.exe` din .NET Framework 4
 ```powershell
 .\build.ps1
 ```
+
+În arhiva din release, codul sursă este în folderul `source`. Rulează `.\source\build.ps1` și exe-ul se creează acolo.
 
 `.\build.ps1 -Test` creează `ShareWatch-test.exe` fără manifestul de administrator, doar pentru testarea interfeței.
 
