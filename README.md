@@ -67,19 +67,22 @@ Some antivirus programs may flag `ShareWatch.exe` as suspicious. An older versio
 - it reads SMB sessions and can disconnect computers;
 - it can add a Windows Firewall rule.
 
-On [VirusTotal](https://www.virustotal.com/gui/file/ce72aad6761dc67ceb790338873d8e3dda62adcb4365b03220bb770be11ad1f4) (version 0.7.2, November 2026), 5 of 68 engines flag it. All 5 results come from machine-learning or heuristic analysis, not from a known malware signature:
+On [VirusTotal](https://www.virustotal.com/gui/file/3a21c3c431f50ad4397db66063d9fdff5c71fa2c419bb10d9c05c7be6c374738) (version 0.7.3, November 2026), 4 of 68 engines flag it. All 4 results come from machine-learning or heuristic analysis, not from a known malware signature:
 
 | Engine | Result |
 |---|---|
-| Bkav Pro | W32.Malware.8DDACA36 |
+| Bkav Pro | W32.Malware.39949BE6 |
 | Elastic | Malicious (moderate Confidence) |
-| Microsoft | Trojan:Win32/Wacatac.C!ml |
 | SecureAge | Malicious |
 | Symantec | ML.Attribute.HighConfidence |
 
-The other 63 engines report it as clean, including BitDefender, Kaspersky, ESET-NOD32, Avast and AVG. Versions 0.7.0 and 0.7.1 had 4 detections (the same, without Microsoft); version 0.6.2 had 5 (with Trapmine instead of Microsoft).
+The other 64 engines report it as clean, including Microsoft, BitDefender, Kaspersky, ESET-NOD32, Avast and AVG. Versions 0.7.0 and 0.7.1 had the same 4 detections; version 0.6.2 had 5 (the same 4 plus Trapmine).
 
-The `!ml` suffix in the Microsoft result means it comes from a machine-learning model, not from a signature. It can change from one build to the next, and it means **Microsoft Defender** may block or quarantine the file. If that happens, you can restore it from Windows Security → Protection history and report it as a false positive at [Microsoft's file submission page](https://www.microsoft.com/en-us/wdsi/filesubmission). On the author's PC, **Bitdefender Antivirus Plus** does not flag the file itself either, but its web protection blocked downloading the bare `ShareWatch.exe` from GitHub ("Dangerous page blocked"), which is why releases ship as a `.zip`. If your antivirus does:
+Version 0.7.2 (withdrawn) was also flagged by Microsoft as `Trojan:Win32/Wacatac.C!ml`. The cause was the GitHub address in the executable's version details; the same build without it was not flagged, so 0.7.3 removed it. The `!ml` suffix means a machine-learning model, not a signature, so such a detection can appear or disappear from one build to the next. If **Microsoft Defender** ever blocks or quarantines the file, you can restore it from Windows Security → Protection history and report it as a false positive at [Microsoft's file submission page](https://www.microsoft.com/en-us/wdsi/filesubmission).
+
+On the author's PC, **Bitdefender Antivirus Plus** does not flag the file, but its web protection blocked downloading the bare `ShareWatch.exe` from GitHub ("Dangerous page blocked"), which is why releases ship as a `.zip`.
+
+If your antivirus flags it:
 
 1. Read the source code. It is all in this repository, with no external libraries.
 2. Build the executable yourself with `.\source\build.ps1` (see below) instead of downloading it.

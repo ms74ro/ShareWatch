@@ -67,19 +67,22 @@ Unele programe antivirus pot semnala `ShareWatch.exe` ca suspect. O versiune mai
 - citește sesiunile SMB și poate deconecta calculatoare;
 - poate adăuga o regulă în Windows Firewall.
 
-Pe [VirusTotal](https://www.virustotal.com/gui/file/ce72aad6761dc67ceb790338873d8e3dda62adcb4365b03220bb770be11ad1f4) (versiunea 0.7.2, noiembrie 2026), 5 din 68 de motoare o semnalează. Toate cele 5 rezultate vin din analiză euristică sau de tip machine learning, nu din semnătura unui virus cunoscut:
+Pe [VirusTotal](https://www.virustotal.com/gui/file/3a21c3c431f50ad4397db66063d9fdff5c71fa2c419bb10d9c05c7be6c374738) (versiunea 0.7.3, noiembrie 2026), 4 din 68 de motoare o semnalează. Toate cele 4 rezultate vin din analiză euristică sau de tip machine learning, nu din semnătura unui virus cunoscut:
 
 | Motor | Rezultat |
 |---|---|
-| Bkav Pro | W32.Malware.8DDACA36 |
+| Bkav Pro | W32.Malware.39949BE6 |
 | Elastic | Malicious (moderate Confidence) |
-| Microsoft | Trojan:Win32/Wacatac.C!ml |
 | SecureAge | Malicious |
 | Symantec | ML.Attribute.HighConfidence |
 
-Celelalte 63 de motoare o raportează ca fiind curată, printre ele BitDefender, Kaspersky, ESET-NOD32, Avast și AVG. Versiunile 0.7.0 și 0.7.1 aveau 4 detecții (aceleași, fără Microsoft); versiunea 0.6.2 avea 5 (cu Trapmine în loc de Microsoft).
+Celelalte 64 de motoare o raportează ca fiind curată, printre ele Microsoft, BitDefender, Kaspersky, ESET-NOD32, Avast și AVG. Versiunile 0.7.0 și 0.7.1 aveau aceleași 4 detecții; versiunea 0.6.2 avea 5 (aceleași 4 plus Trapmine).
 
-Sufixul `!ml` din rezultatul Microsoft înseamnă că detecția vine de la un model de machine learning, nu dintr-o semnătură. Poate apărea sau dispărea de la o compilare la alta și înseamnă că **Microsoft Defender** poate bloca fișierul sau îl poate pune în carantină. Dacă se întâmplă asta, îl poți restaura din Securitate Windows → Istoricul protecției și îl poți raporta ca alertă falsă pe [pagina Microsoft de trimitere a fișierelor](https://www.microsoft.com/en-us/wdsi/filesubmission). Nici **Bitdefender Antivirus Plus**, pe PC-ul autorului, nu semnalează fișierul local. Totuși, protecția web Bitdefender a blocat descărcarea exe-ului simplu de pe GitHub („Dangerous page blocked”). De aceea, release-urile se publică ca arhivă `.zip`. Dacă antivirusul tău o face:
+Versiunea 0.7.2 (retrasă) era semnalată și de Microsoft, ca `Trojan:Win32/Wacatac.C!ml`. Cauza a fost adresa GitHub din detaliile de versiune ale executabilului: aceeași compilare fără ea nu a fost semnalată, așa că 0.7.3 a scos-o. Sufixul `!ml` înseamnă un model de machine learning, nu o semnătură, deci o astfel de detecție poate apărea sau dispărea de la o compilare la alta. Dacă **Microsoft Defender** blochează vreodată fișierul sau îl pune în carantină, îl poți restaura din Securitate Windows → Istoricul protecției și îl poți raporta ca alertă falsă pe [pagina Microsoft de trimitere a fișierelor](https://www.microsoft.com/en-us/wdsi/filesubmission).
+
+Pe PC-ul autorului, **Bitdefender Antivirus Plus** nu semnalează fișierul, dar protecția web Bitdefender a blocat descărcarea exe-ului simplu de pe GitHub („Dangerous page blocked”). De aceea, release-urile se publică ca arhivă `.zip`.
+
+Dacă antivirusul tău o semnalează:
 
 1. Citește codul sursă. Este tot în acest depozit, fără biblioteci externe.
 2. Compilează singur executabilul cu `.\source\build.ps1` (vezi mai jos), în loc să-l descarci.
