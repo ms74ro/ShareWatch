@@ -79,7 +79,7 @@ On [VirusTotal](https://www.virustotal.com/gui/file/11278cce3645ebf923c2af328f9e
 The other 62 engines report it as clean, including Microsoft, BitDefender, Kaspersky, ESET-NOD32, Avast and AVG. (Version 0.7.0 had the same 4 detections; version 0.6.2 had 5, the same 4 plus Trapmine.) On the author's PC, **Bitdefender Antivirus Plus** does not flag the file itself either, but its web protection blocked downloading the bare `ShareWatch.exe` from GitHub ("Dangerous page blocked"), which is why releases ship as a `.zip`. If your antivirus does:
 
 1. Read the source code. It is all in this repository, with no external libraries.
-2. Build the executable yourself with `.\build.ps1` (see below) instead of downloading it.
+2. Build the executable yourself with `.\source\build.ps1` (see below) instead of downloading it.
 3. Or check that the downloaded file matches the one in the release. The release notes give its SHA-256. Compare it with:
 
    ```powershell
@@ -90,17 +90,17 @@ The other 62 engines report it as clean, including Microsoft, BitDefender, Kaspe
 
 ## Building
 
-No Visual Studio needed. The script uses `csc.exe` from .NET Framework 4, which is part of Windows:
+No Visual Studio needed. The script uses `csc.exe` from .NET Framework 4, which is part of Windows. The source code is in the `source` folder, both in this repository and in the release zip:
 
 ```powershell
-.\build.ps1
+.\source\build.ps1
 ```
 
-In the release zip the source code is in the `source` folder: run `.\source\build.ps1` and the exe is created there.
+The exe is created in the `source` folder.
 
-`.\build.ps1 -Test` builds `ShareWatch-test.exe` without the administrator manifest, for testing the interface only.
+`.\source\build.ps1 -Test` builds `source\ShareWatch-test.exe` without the administrator manifest, for testing the interface only.
 
-The README screenshots come from the test build with made-up shares, computers and log entries (code in `Demo.cs`, compiled only into the test build). Put the test exe in a folder with a `sharewatch.ini` containing `theme=1` and `lang=2` (or `lang=1` for Romanian), then run:
+The README screenshots come from the test build with made-up shares, computers and log entries (code in `source/Demo.cs`, compiled only into the test build). Put the test exe in a folder with a `sharewatch.ini` containing `theme=1` and `lang=2` (or `lang=1` for Romanian), then run:
 
 ```powershell
 .\ShareWatch-test.exe --screenshots .\shots
@@ -111,23 +111,25 @@ It saves one PNG per tab plus the notification, then exits.
 `language/en.json` is generated from the built-in English texts. After adding or changing texts, regenerate it with the test build:
 
 ```powershell
-.\ShareWatch-test.exe --export-lang language\en.json
+.\source\ShareWatch-test.exe --export-lang language\en.json
 ```
 
 ## Files
 
 | File | Contents |
 |---|---|
-| `ShareWatch.cs` | Entry point, settings, NetApi (shares and sessions) |
-| `MainForm.cs` | Main window and tabs |
-| `Tray.cs` | Tray icon, menu, monitoring loop |
-| `Toast.cs` | Notification window |
-| `ShareDialog.cs` | Share / stop sharing a folder |
-| `BlockList.cs` | Block list |
-| `Firewall.cs` | Windows Firewall rule |
-| `Support.cs` | Translations and helpers |
-| `Demo.cs` | Made-up data and screenshots (test build only) |
-| `build.ps1` | Build script |
+| `source/ShareWatch.cs` | Entry point, settings, NetApi (shares and sessions) |
+| `source/MainForm.cs` | Main window and tabs |
+| `source/Tray.cs` | Tray icon, menu, monitoring loop |
+| `source/Toast.cs` | Notification window |
+| `source/ShareDialog.cs` | Share / stop sharing a folder |
+| `source/BlockList.cs` | Block list |
+| `source/Firewall.cs` | Windows Firewall rule |
+| `source/Support.cs` | Translations and helpers |
+| `source/Demo.cs` | Made-up data and screenshots (test build only) |
+| `source/build.ps1` | Build script |
+| `source/app.manifest` | Administrator manifest |
+| `language/` | Language files (`en.json` is the template) |
 
 ## Changes
 

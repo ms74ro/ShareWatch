@@ -79,7 +79,7 @@ Pe [VirusTotal](https://www.virustotal.com/gui/file/11278cce3645ebf923c2af328f9e
 Celelalte 62 de motoare o raportează ca fiind curată, printre ele Microsoft, BitDefender, Kaspersky, ESET-NOD32, Avast și AVG. (Versiunea 0.7.0 avea aceleași 4 detecții; versiunea 0.6.2 avea 5, aceleași 4 plus Trapmine.) Nici **Bitdefender Antivirus Plus**, pe PC-ul autorului, nu semnalează fișierul local. Totuși, protecția web Bitdefender a blocat descărcarea exe-ului simplu de pe GitHub („Dangerous page blocked”). De aceea, release-urile se publică ca arhivă `.zip`. Dacă antivirusul tău o face:
 
 1. Citește codul sursă. Este tot în acest depozit, fără biblioteci externe.
-2. Compilează singur executabilul cu `.\build.ps1` (vezi mai jos), în loc să-l descarci.
+2. Compilează singur executabilul cu `.\source\build.ps1` (vezi mai jos), în loc să-l descarci.
 3. Sau verifică dacă fișierul descărcat este cel din release. Amprenta SHA-256 e trecută în notele release-ului. Compar-o cu:
 
    ```powershell
@@ -90,17 +90,17 @@ Celelalte 62 de motoare o raportează ca fiind curată, printre ele Microsoft, B
 
 ## Compilare
 
-Nu e nevoie de Visual Studio. Scriptul folosește `csc.exe` din .NET Framework 4, inclus în Windows:
+Nu e nevoie de Visual Studio. Scriptul folosește `csc.exe` din .NET Framework 4, inclus în Windows. Codul sursă este în folderul `source`, atât în acest depozit, cât și în arhiva din release:
 
 ```powershell
-.\build.ps1
+.\source\build.ps1
 ```
 
-În arhiva din release, codul sursă este în folderul `source`. Rulează `.\source\build.ps1` și exe-ul se creează acolo.
+Exe-ul se creează în folderul `source`.
 
-`.\build.ps1 -Test` creează `ShareWatch-test.exe` fără manifestul de administrator, doar pentru testarea interfeței.
+`.\source\build.ps1 -Test` creează `source\ShareWatch-test.exe` fără manifestul de administrator, doar pentru testarea interfeței.
 
-Capturile din README provin din varianta de test, cu partajări, calculatoare și jurnal fictive (codul e în `Demo.cs`, compilat doar în varianta de test). Pune exe-ul de test într-un folder cu un `sharewatch.ini` care conține `theme=1` și `lang=1` (sau `lang=2` pentru engleză), apoi rulează:
+Capturile din README provin din varianta de test, cu partajări, calculatoare și jurnal fictive (codul e în `source/Demo.cs`, compilat doar în varianta de test). Pune exe-ul de test într-un folder cu un `sharewatch.ini` care conține `theme=1` și `lang=1` (sau `lang=2` pentru engleză), apoi rulează:
 
 ```powershell
 .\ShareWatch-test.exe --screenshots .\capturi
@@ -111,23 +111,25 @@ Salvează câte un PNG pentru fiecare tab și pentru notificare, apoi se închid
 `language/en.json` se generează din textele în engleză integrate. După ce adaugi sau modifici texte, regenerează-l cu varianta de test:
 
 ```powershell
-.\ShareWatch-test.exe --export-lang language\en.json
+.\source\ShareWatch-test.exe --export-lang language\en.json
 ```
 
 ## Fișiere
 
 | Fișier | Conținut |
 |---|---|
-| `ShareWatch.cs` | Punct de intrare, setări, NetApi (partajări și sesiuni) |
-| `MainForm.cs` | Fereastra principală și taburile |
-| `Tray.cs` | Iconița din tray, meniul, bucla de monitorizare |
-| `Toast.cs` | Fereastra de notificare |
-| `ShareDialog.cs` | Partajare / oprire partajare folder |
-| `BlockList.cs` | Lista de blocare |
-| `Firewall.cs` | Regula din Windows Firewall |
-| `Support.cs` | Traduceri și funcții ajutătoare |
-| `Demo.cs` | Date fictive și capturi (doar în varianta de test) |
-| `build.ps1` | Scriptul de compilare |
+| `source/ShareWatch.cs` | Punct de intrare, setări, NetApi (partajări și sesiuni) |
+| `source/MainForm.cs` | Fereastra principală și taburile |
+| `source/Tray.cs` | Iconița din tray, meniul, bucla de monitorizare |
+| `source/Toast.cs` | Fereastra de notificare |
+| `source/ShareDialog.cs` | Partajare / oprire partajare folder |
+| `source/BlockList.cs` | Lista de blocare |
+| `source/Firewall.cs` | Regula din Windows Firewall |
+| `source/Support.cs` | Traduceri și funcții ajutătoare |
+| `source/Demo.cs` | Date fictive și capturi (doar în varianta de test) |
+| `source/build.ps1` | Scriptul de compilare |
+| `source/app.manifest` | Manifestul de administrator |
+| `language/` | Fișierele de limbă (`en.json` este modelul) |
 
 ## Modificări
 
