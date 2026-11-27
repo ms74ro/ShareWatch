@@ -30,7 +30,7 @@ Alte capturi (în engleză și română, temă luminoasă, date fictive) sunt î
 
 ## Utilizare
 
-1. Descarcă `ShareWatch-x.y.z.zip` din [Releases](https://github.com/ms74ro/ShareWatch/releases/latest) și dezarhivează-l într-un folder la alegere. Arhiva conține `ShareWatch.exe`, folderul `language` și licența. `ShareWatch.exe` este atașat și separat, dar protecția web a unor antivirusuri (de exemplu Bitdefender) blochează descărcarea unui `.exe` simplu de pe GitHub.
+1. Descarcă `ShareWatch-x.y.z.zip` din [Releases](https://github.com/ms74ro/ShareWatch/releases/latest) și dezarhivează-l într-un folder la alegere. Arhiva conține `ShareWatch.exe`, folderul `language` și licența. Exe-ul nu mai este atașat separat, pentru că protecția web a unor antivirusuri (de exemplu Bitdefender) îi blochează descărcarea de pe GitHub.
 2. Rulează `ShareWatch.exe` și acceptă cererea de administrator.
 3. Iconița apare în tray. Dublu-clic pe ea deschide fereastra.
 
@@ -76,7 +76,7 @@ Pe [VirusTotal](https://www.virustotal.com/gui/file/11278cce3645ebf923c2af328f9e
 | SecureAge | Malicious |
 | Symantec | ML.Attribute.HighConfidence |
 
-Celelalte 62 de motoare o raportează ca fiind curată, printre ele Microsoft, BitDefender, Kaspersky, ESET-NOD32, Avast și AVG. (Versiunea 0.7.0 avea aceleași 4 detecții; versiunea 0.6.2 avea 5, aceleași 4 plus Trapmine.) Nici **Bitdefender Antivirus Plus**, pe PC-ul autorului, nu semnalează fișierul local. Totuși, protecția web Bitdefender poate bloca descărcarea `ShareWatch.exe` de pe GitHub („Dangerous page blocked”). De aceea, descarcă arhiva `.zip`. Dacă antivirusul tău o face:
+Celelalte 62 de motoare o raportează ca fiind curată, printre ele Microsoft, BitDefender, Kaspersky, ESET-NOD32, Avast și AVG. (Versiunea 0.7.0 avea aceleași 4 detecții; versiunea 0.6.2 avea 5, aceleași 4 plus Trapmine.) Nici **Bitdefender Antivirus Plus**, pe PC-ul autorului, nu semnalează fișierul local. Totuși, protecția web Bitdefender a blocat descărcarea exe-ului simplu de pe GitHub („Dangerous page blocked”). De aceea, release-urile se publică ca arhivă `.zip`. Dacă antivirusul tău o face:
 
 1. Citește codul sursă. Este tot în acest depozit, fără biblioteci externe.
 2. Compilează singur executabilul cu `.\build.ps1` (vezi mai jos), în loc să-l descarci.
