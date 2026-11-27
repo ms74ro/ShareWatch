@@ -193,6 +193,7 @@ namespace ShareWatch
             tray.Icon = IconOk;
             tray.ContextMenuStrip = menu;
             tray.DoubleClick += delegate { ShowMain(); };
+            tray.MouseClick += delegate(object s, MouseEventArgs e) { if (e.Button == MouseButtons.Left && Settings.TrayOneClick) ShowMain(); };
             SetupTrayIcon(startHidden);
             LocalizeMenu();
             ApplyMenuTheme();
@@ -289,7 +290,7 @@ namespace ShareWatch
         {
             ui.BeginInvoke((MethodInvoker)delegate
             {
-                L.Apply(Settings.Lang);
+                L.Apply(Settings.Lang, Settings.LangCode);
                 LocalizeMenu();
                 if (main != null && !main.IsDisposed)
                 {

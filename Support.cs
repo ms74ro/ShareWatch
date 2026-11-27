@@ -6,6 +6,7 @@ using System.Globalization;
 using System.IO;
 using System.Media;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Windows.Forms;
 using Microsoft.Win32;
 
@@ -13,23 +14,130 @@ namespace ShareWatch
 {
     // ------------------------------------------------------------------ limba
     // Textele din cod sunt in romana (cheia); pentru engleza se cauta traducerea in dictionar.
+    // Alte limbi: language\xx.json langa executabil (cheie = textul in romana, valoare = traducerea).
+    // Romana si engleza sunt integrate; en.json e doar modelul pentru traducatori.
     static class L
     {
         public static bool En;
+        static Dictionary<string, string> extra;   // limba din fisier (null = romana / engleza integrate)
 
-        public static void Apply(int pref)
+        public class LangFile { public string Code, Name, Path; }
+
+        static string[] LangDirs()
         {
-            En = pref == 2 || (pref == 0 && CultureInfo.CurrentUICulture.TwoLetterISOLanguageName != "ro");
+            string exe = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "language");
+            string dat = Settings.Dir == null ? exe : Path.Combine(Settings.Dir, "language");
+            return string.Equals(exe.TrimEnd('\\'), dat.TrimEnd('\\'), StringComparison.OrdinalIgnoreCase) ? new[] { exe } : new[] { exe, dat };
+        }
+
+        // limbile din language\*.json (fara ro si en, care sunt integrate), sortate dupa nume
+        public static List<LangFile> Available()
+        {
+            Dictionary<string, LangFile> found = new Dictionary<string, LangFile>(StringComparer.OrdinalIgnoreCase);
+            foreach (string dir in LangDirs())
+            {
+                if (!Directory.Exists(dir)) continue;
+                foreach (string f in Directory.GetFiles(dir, "*.json"))
+                {
+                    string code = Path.GetFileNameWithoutExtension(f).ToLowerInvariant();
+                    if (code == "ro" || code == "en" || found.ContainsKey(code)) continue;
+                    Dictionary<string, string> m = Load(f);
+                    if (m == null) continue;
+                    string name;
+                    if (!m.TryGetValue("_name", out name) || string.IsNullOrEmpty(name)) name = code;
+                    found[code] = new LangFile { Code = code, Name = name, Path = f };
+                }
+            }
+            List<LangFile> res = new List<LangFile>(found.Values);
+            res.Sort(delegate(LangFile a, LangFile b) { return string.Compare(a.Name, b.Name, StringComparison.CurrentCultureIgnoreCase); });
+            return res;
+        }
+
+        static Dictionary<string, string> Load(string file)
+        {
+            try
+            {
+                var js = new System.Web.Script.Serialization.JavaScriptSerializer();
+                js.MaxJsonLength = 8 * 1024 * 1024;
+                Dictionary<string, object> raw = js.Deserialize<Dictionary<string, object>>(File.ReadAllText(file, System.Text.Encoding.UTF8));
+                Dictionary<string, string> m = new Dictionary<string, string>();
+                foreach (KeyValuePair<string, object> kv in raw)
+                {
+                    string s = kv.Value as string;
+                    if (!string.IsNullOrEmpty(s)) m[kv.Key] = s;
+                }
+                return m;
+            }
+            catch { return null; }   // JSON invalid: limba e ignorata
+        }
+
+        // pref: 0 = auto, 1 = romana, 2 = engleza, 3 = limba din fisier (code)
+        public static void Apply(int pref, string code)
+        {
+            extra = null;
+            string win = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName.ToLowerInvariant();
+            if (pref == 0)
+            {
+                if (win == "ro") { En = false; return; }
+                code = win;
+            }
+            if (pref == 0 || pref == 3)
+            {
+                foreach (LangFile lf in Available())
+                    if (string.Equals(lf.Code, code, StringComparison.OrdinalIgnoreCase)) { extra = Load(lf.Path); break; }
+            }
+            En = pref != 1;   // ce lipseste din fisier se afiseaza in engleza
         }
 
         public static string T(string ro)
         {
             string e;
+            if (extra != null && extra.TryGetValue(ro, out e)) return e;
             if (En && map.TryGetValue(ro, out e)) return e;
             return ro;
         }
 
-        public static string F(string ro, params object[] args) { return string.Format(T(ro), args); }
+        public static string F(string ro, params object[] args)
+        {
+            try { return string.Format(T(ro), args); }
+            catch (FormatException)
+            {
+                // traducere cu {0} gresit: revenim la engleza / romana
+                string e;
+                return string.Format(En && map.TryGetValue(ro, out e) ? e : ro, args);
+            }
+        }
+
+        // scrie modelul pentru traducatori (language\en.json): cheie = romana, valoare = engleza
+        public static void Export(string file)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append("{\n");
+            sb.Append("  \"_name\": \"English\",\n");
+            sb.Append("  \"_info\": \"ShareWatch ").Append(AppInfo.Version).Append(" - copy this file as xx.json (xx = language code, e.g. de.json), set _name and translate only the values. Keep the keys (Romanian text) and {0}, {1} unchanged.\"");
+            foreach (KeyValuePair<string, string> kv in map)
+                sb.Append(",\n  ").Append(Js(kv.Key)).Append(": ").Append(Js(kv.Value));
+            sb.Append("\n}\n");
+            string dir = Path.GetDirectoryName(Path.GetFullPath(file));
+            if (!string.IsNullOrEmpty(dir)) Directory.CreateDirectory(dir);
+            File.WriteAllText(file, sb.ToString(), new System.Text.UTF8Encoding(false));
+        }
+
+        static string Js(string s)
+        {
+            StringBuilder sb = new StringBuilder("\"");
+            foreach (char c in s)
+            {
+                if (c == '"') sb.Append("\\\"");
+                else if (c == '\\') sb.Append("\\\\");
+                else if (c == '\n') sb.Append("\\n");
+                else if (c == '\r') sb.Append("\\r");
+                else if (c == '\t') sb.Append("\\t");
+                else if (c < 0x20) sb.Append("\\u").Append(((int)c).ToString("x4"));
+                else sb.Append(c);
+            }
+            return sb.Append('"').ToString();
+        }
 
         static readonly Dictionary<string, string> map = new Dictionary<string, string>
         {
@@ -116,6 +224,8 @@ namespace ShareWatch
             { "Întunecat", "Dark" },
             { "Temă:", "Theme:" },
             { "Limbă:", "Language:" },
+            { "Deschide fereastra cu un singur clic pe iconița din tray", "Open the window with a single click on the tray icon" },
+            { "Alte limbi: fișiere language\\xx.json lângă executabil (vezi README).", "Other languages: language\\xx.json files next to the executable (see README)." },
             { "Setările se salvează automat în sharewatch.ini, lângă executabil. Închiderea ferestrei (X) lasă aplicația activă în tray; pentru oprire folosește Ieșire din meniul iconiței din tray.",
               "Settings are saved automatically in sharewatch.ini, next to the executable. Closing the window (X) keeps the application running in the tray; to stop it use Exit from the tray icon menu." },
             { "Nu am putut modifica pornirea automată. Rulează aplicația ca Administrator.", "Could not change automatic start. Run the application as Administrator." },

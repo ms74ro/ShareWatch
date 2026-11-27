@@ -22,14 +22,14 @@ using System.Windows.Forms;
 [assembly: AssemblyDescription("Monitorizare accesari foldere partajate")]
 [assembly: AssemblyProduct("ShareWatch")]
 [assembly: AssemblyCopyright("by ms74ro & Claude")]
-[assembly: AssemblyVersion("0.6.2.0")]
-[assembly: AssemblyFileVersion("0.6.2.0")]
+[assembly: AssemblyVersion("0.7.0.0")]
+[assembly: AssemblyFileVersion("0.7.0.0")]
 
 namespace ShareWatch
 {
     static class AppInfo
     {
-        public const string Version = "0.6.2";
+        public const string Version = "0.7.0";
         // Istoricul versiunilor e in CHANGELOG.md (nu mai e inclus in exe).
         // Cand proiectul ajunge pe GitHub, pune aici adresa fisierului; daca e completata, linkul din Despre o foloseste.
         public const string ChangelogUrl = "https://github.com/ms74ro/ShareWatch/blob/main/CHANGELOG.md";
@@ -54,6 +54,9 @@ namespace ShareWatch
         static void Main(string[] args)
         {
 #if TEST
+            // ShareWatch-test.exe --export-lang language\en.json : modelul pentru traduceri
+            int ex = Array.IndexOf(args, "--export-lang");
+            if (ex >= 0) { L.Export(ex + 1 < args.Length ? args[ex + 1] : "en.json"); return; }
             const string suffix = "_Test";   // varianta de test nu se loveste de instanta normala
             Demo.Init(args);
 #else
@@ -79,7 +82,7 @@ namespace ShareWatch
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
                 Settings.Init();
-                L.Apply(Settings.Lang);
+                L.Apply(Settings.Lang, Settings.LangCode);
                 Theme.Pref = Settings.Theme;
                 Theme.Update();
                 Application.Run(new TrayApp(Array.IndexOf(args, "--tray") >= 0, Array.IndexOf(args, "--demo") >= 0, show));
@@ -103,7 +106,9 @@ namespace ShareWatch
         public static bool NotifyBlocked = false;   // notificare (fara sunet) cand un PC blocat e deconectat
         public static bool BlockFirewall = false;   // regula in Windows Firewall pentru IP-urile blocate
         public static int Theme = 0;   // 0 = auto (urmeaza Windows), 1 = luminos, 2 = intunecat
-        public static int Lang = 0;    // 0 = auto, 1 = romana, 2 = engleza
+        public static int Lang = 0;    // 0 = auto, 1 = romana, 2 = engleza, 3 = limba din language\LangCode.json
+        public static string LangCode = "";
+        public static bool TrayOneClick = false;   // deschide fereastra la un singur clic pe iconita din tray
         public static int WinX, WinY, WinW, WinH;   // pozitia ferestrei (WinW = 0 -> nesalvata)
         public static bool WinMax;
         public const int PollMs = 1000;
@@ -145,7 +150,9 @@ namespace ShareWatch
                         else if (k == "notifyblocked") NotifyBlocked = v == "1";
                         else if (k == "blockfirewall") BlockFirewall = v == "1";
                         else if (k == "theme" && int.TryParse(v, out n)) Theme = Math.Max(0, Math.Min(2, n));
-                        else if (k == "lang" && int.TryParse(v, out n)) Lang = Math.Max(0, Math.Min(2, n));
+                        else if (k == "lang" && int.TryParse(v, out n)) Lang = Math.Max(0, Math.Min(3, n));
+                        else if (k == "langcode") LangCode = v;
+                        else if (k == "trayclick") TrayOneClick = v == "1";
                         else if (k == "winx" && int.TryParse(v, out n)) WinX = n;
                         else if (k == "winy" && int.TryParse(v, out n)) WinY = n;
                         else if (k == "winw" && int.TryParse(v, out n)) WinW = n;
@@ -190,6 +197,8 @@ namespace ShareWatch
                 sb.Append("blockfirewall=").Append(BlockFirewall ? 1 : 0).Append("\r\n");
                 sb.Append("theme=").Append(Theme).Append("\r\n");
                 sb.Append("lang=").Append(Lang).Append("\r\n");
+                sb.Append("langcode=").Append(LangCode).Append("\r\n");
+                sb.Append("trayclick=").Append(TrayOneClick ? 1 : 0).Append("\r\n");
                 sb.Append("winx=").Append(WinX).Append("\r\nwiny=").Append(WinY).Append("\r\nwinw=").Append(WinW).Append("\r\nwinh=").Append(WinH).Append("\r\n");
                 sb.Append("winmax=").Append(WinMax ? 1 : 0).Append("\r\n");
                 lock (shares) { foreach (KeyValuePair<string, bool> kv in shares) sb.Append("share.").Append(kv.Key).Append('=').Append(kv.Value ? 1 : 0).Append("\r\n"); }

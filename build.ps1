@@ -28,7 +28,7 @@ $icoPath = Join-Path $here 'app.ico'
 $csc = "$env:WINDIR\Microsoft.NET\Framework64\v4.0.30319\csc.exe"
 $out = if ($Test) { 'ShareWatch-test.exe' } else { 'ShareWatch.exe' }
 $args = @('/nologo','/target:winexe','/optimize+','/codepage:65001',"/win32icon:$icoPath","/out:$(Join-Path $here $out)",
-  '/r:System.dll','/r:System.Drawing.dll','/r:System.Windows.Forms.dll','/r:System.Core.dll','/r:Microsoft.CSharp.dll')
+  '/r:System.dll','/r:System.Drawing.dll','/r:System.Windows.Forms.dll','/r:System.Core.dll','/r:Microsoft.CSharp.dll','/r:System.Web.Extensions.dll')
 if ($Test) { $args += '/define:TEST' }
 if (-not $Test) { $args += "/win32manifest:$(Join-Path $here 'app.manifest')" }
 $args += (Join-Path $here 'ShareWatch.cs')

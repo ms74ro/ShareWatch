@@ -20,7 +20,8 @@ Alte capturi (în engleză și română, temă luminoasă, date fictive) sunt î
 - **Blocare opțională în Windows Firewall**: o regulă de intrare (`ShareWatch - blocare SMB`) blochează TCP 139/445 de la IP-urile blocate.
 - **Istoric**: jurnalul accesărilor în `acces_foldere.log`.
 - **Pornire automată cu Windows** direct în tray, cu drepturi de administrator și fără UAC.
-- Temă luminoasă / întunecată / automată; română și engleză (automat după Windows).
+- Opțional: deschiderea ferestrei cu un singur clic pe iconița din tray.
+- Temă luminoasă / întunecată / automată; română și engleză integrate, alte limbi din fișiere `language\xx.json` (vezi [Limbi](#limbi)).
 
 ## Cerințe
 
@@ -34,6 +35,26 @@ Alte capturi (în engleză și română, temă luminoasă, date fictive) sunt î
 3. Iconița apare în tray. Dublu-clic pe ea deschide fereastra.
 
 Setările se salvează în `sharewatch.ini` lângă executabil (sau în `%LOCALAPPDATA%\ShareWatch` dacă folderul nu permite scrierea).
+
+## Limbi
+
+Româna și engleza sunt integrate în executabil. Alte limbi se încarcă din fișiere JSON aflate într-un folder `language` lângă `ShareWatch.exe`:
+
+```
+ShareWatch.exe
+language\
+    de.json
+    fr.json
+```
+
+Pentru a adăuga o limbă:
+
+1. Copiază [`language/en.json`](language/en.json) cu numele `xx.json`, unde `xx` este codul limbii din două litere (`de.json`, `fr.json` etc.).
+2. Completează `_name` cu numele limbii, așa cum va apărea în Opțiuni (de ex. `Deutsch`).
+3. Tradu doar valorile. Cheile (textul în română) și marcajele de tipul `{0}` rămân neschimbate.
+4. Repornește ShareWatch și alege limba din Opțiuni → Limbă. La **Automat**, se folosește limba din Windows, dacă există fișier pentru ea.
+
+Textele care lipsesc dintr-un fișier apar în engleză, iar un fișier JSON invalid este ignorat. `ro.json` și `en.json` nu se încarcă niciodată (ambele limbi sunt integrate), deci `en.json` poate rămâne în folder ca model.
 
 ## Alerte antivirus
 
@@ -83,6 +104,12 @@ Capturile din README provin din varianta de test, cu partajări, calculatoare ș
 ```
 
 Salvează câte un PNG pentru fiecare tab și pentru notificare, apoi se închide.
+
+`language/en.json` se generează din textele în engleză integrate. După ce adaugi sau modifici texte, regenerează-l cu varianta de test:
+
+```powershell
+.\ShareWatch-test.exe --export-lang language\en.json
+```
 
 ## Fișiere
 

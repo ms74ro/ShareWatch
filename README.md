@@ -20,7 +20,8 @@ More screenshots (English and Romanian, light theme, made-up data) are in [docs/
 - **Optional Windows Firewall blocking**: one inbound rule (`ShareWatch - blocare SMB`) blocks TCP 139/445 from blocked IPs.
 - **History**: access log in `acces_foldere.log`.
 - **Start with Windows** straight to the tray, with administrator rights and no UAC prompt.
-- Light / dark / automatic theme; Romanian and English (automatic from Windows).
+- Optional: open the window with a single click on the tray icon.
+- Light / dark / automatic theme; Romanian and English built in, other languages from `language\xx.json` files (see [Languages](#languages)).
 
 ## Requirements
 
@@ -34,6 +35,26 @@ More screenshots (English and Romanian, light theme, made-up data) are in [docs/
 3. The icon appears in the tray. Double-click it to open the window.
 
 Settings are saved in `sharewatch.ini` next to the executable (or in `%LOCALAPPDATA%\ShareWatch` if that folder is not writable).
+
+## Languages
+
+Romanian and English are built into the executable. Other languages are loaded from JSON files in a `language` folder next to `ShareWatch.exe`:
+
+```
+ShareWatch.exe
+language\
+    de.json
+    fr.json
+```
+
+To add a language:
+
+1. Copy [`language/en.json`](language/en.json) as `xx.json`, where `xx` is the two-letter language code (`de.json`, `fr.json`, ...).
+2. Set `_name` to the language name as it should appear in Options (e.g. `Deutsch`).
+3. Translate only the values. Keep the keys (the Romanian text) and placeholders such as `{0}` unchanged.
+4. Restart ShareWatch and pick the language in Options → Language. With **Automatic**, the language matching Windows is used if a file for it exists.
+
+Texts missing from a file are shown in English, and an invalid JSON file is ignored. `ro.json` and `en.json` are never loaded (both languages are built in), so `en.json` can stay in the folder as a template.
 
 ## Antivirus warnings
 
@@ -83,6 +104,12 @@ The README screenshots come from the test build with made-up shares, computers a
 ```
 
 It saves one PNG per tab plus the notification, then exits.
+
+`language/en.json` is generated from the built-in English texts. After adding or changing texts, regenerate it with the test build:
+
+```powershell
+.\ShareWatch-test.exe --export-lang language\en.json
+```
 
 ## Files
 

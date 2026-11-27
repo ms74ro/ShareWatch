@@ -105,7 +105,8 @@ namespace ShareWatch
         DateTime histTime = DateTime.MinValue;
 
         // Optiuni
-        CheckBox chkNotify, chkLocal, chkAuto, chkSound, chkBlock, chkNotifyBlocked, chkFirewall, chkHideAdmin;
+        CheckBox chkNotify, chkLocal, chkAuto, chkSound, chkBlock, chkNotifyBlocked, chkFirewall, chkHideAdmin, chkTrayClick;
+        List<L.LangFile> langFiles = new List<L.LangFile>();
         Label lblFirewall;
         ListView lvBlock;
         TextBox txtBlock;
@@ -764,12 +765,17 @@ namespace ShareWatch
             cbTheme.Items.AddRange(new object[] { L.T("Automat (ca Windows)"), L.T("Luminos"), L.T("Întunecat") });
             cbLang = new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList, Width = S(160) };
             cbLang.Items.AddRange(new object[] { L.T("Automat (ca Windows)"), "Română", "English" });
+            langFiles = L.Available();
+            foreach (L.LangFile lf in langFiles) cbLang.Items.Add(lf.Name);
             FlowLayoutPanel r3 = new FlowLayoutPanel { AutoSize = true, WrapContents = false, Margin = new Padding(3, 10, 3, 3) };
             r3.Controls.Add(new Label { Text = L.T("Temă:"), AutoSize = true, Margin = new Padding(3, S(5), 6, 0) });
             r3.Controls.Add(cbTheme);
             FlowLayoutPanel r4 = new FlowLayoutPanel { AutoSize = true, WrapContents = false };
             r4.Controls.Add(new Label { Text = L.T("Limbă:"), AutoSize = true, Margin = new Padding(3, S(5), 6, 0) });
             r4.Controls.Add(cbLang);
+            r4.Controls.Add(new Label { Text = L.T("Alte limbi: fișiere language\\xx.json lângă executabil (vezi README)."), AutoSize = true, Tag = "muted", Margin = new Padding(S(10), S(5), 3, 0) });
+            chkTrayClick = new CheckBox { Text = L.T("Deschide fereastra cu un singur clic pe iconița din tray"), AutoSize = true, Margin = new Padding(3, 6, 3, 6) };
+            chkTrayClick.CheckedChanged += delegate { if (loadingOpt) return; Settings.TrayOneClick = chkTrayClick.Checked; Settings.Save(); };
 
             Button test = new Button { Text = L.T("Test notificare"), AutoSize = true, Margin = new Padding(3, 14, 3, 3) };
             Label note = new Label
@@ -794,7 +800,10 @@ namespace ShareWatch
             cbLang.SelectedIndexChanged += delegate
             {
                 if (loadingOpt) return;
-                Settings.Lang = cbLang.SelectedIndex; Settings.Save();
+                int sel = cbLang.SelectedIndex;
+                if (sel >= 3) { Settings.Lang = 3; Settings.LangCode = langFiles[sel - 3].Code; }
+                else { Settings.Lang = sel; Settings.LangCode = ""; }
+                Settings.Save();
                 app.ReloadUi();
             };
             chkAuto.Click += delegate
@@ -809,7 +818,7 @@ namespace ShareWatch
             };
             test.Click += delegate { app.TestToast(); };
 
-            p.Controls.AddRange(new Control[] { chkNotify, chkSound, chkLocal, chkHideAdmin, chkAuto, r1, r2, r3, r4, test });
+            p.Controls.AddRange(new Control[] { chkNotify, chkSound, chkLocal, chkHideAdmin, chkAuto, chkTrayClick, r1, r2, r3, r4, test });
             BuildBlockList(p);
             p.Controls.Add(note);
             page.Controls.Add(p);
@@ -947,7 +956,12 @@ namespace ShareWatch
             numToast.Value = Settings.ToastSeconds;
             numCool.Value = Settings.CooldownSec;
             cbTheme.SelectedIndex = Settings.Theme;
-            cbLang.SelectedIndex = Settings.Lang;
+            int li = Settings.Lang <= 2 ? Settings.Lang : 0;
+            if (Settings.Lang == 3)
+                for (int i = 0; i < langFiles.Count; i++)
+                    if (string.Equals(langFiles[i].Code, Settings.LangCode, StringComparison.OrdinalIgnoreCase)) { li = 3 + i; break; }
+            cbLang.SelectedIndex = li;
+            chkTrayClick.Checked = Settings.TrayOneClick;
             chkBlock.Checked = Settings.BlockEnabled;
             chkNotifyBlocked.Checked = Settings.NotifyBlocked;
             chkFirewall.Checked = Settings.BlockFirewall;
