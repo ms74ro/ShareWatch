@@ -22,14 +22,14 @@ using System.Windows.Forms;
 [assembly: AssemblyDescription("Monitorizare accesari foldere partajate")]
 [assembly: AssemblyProduct("ShareWatch")]
 [assembly: AssemblyCopyright("by ms74ro & Claude")]
-[assembly: AssemblyVersion("0.7.0.0")]
-[assembly: AssemblyFileVersion("0.7.0.0")]
+[assembly: AssemblyVersion("0.7.1.0")]
+[assembly: AssemblyFileVersion("0.7.1.0")]
 
 namespace ShareWatch
 {
     static class AppInfo
     {
-        public const string Version = "0.7.0";
+        public const string Version = "0.7.1";
         // Istoricul versiunilor e in CHANGELOG.md (nu mai e inclus in exe).
         // Cand proiectul ajunge pe GitHub, pune aici adresa fisierului; daca e completata, linkul din Despre o foloseste.
         public const string ChangelogUrl = "https://github.com/ms74ro/ShareWatch/blob/main/CHANGELOG.md";

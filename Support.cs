@@ -380,6 +380,11 @@ namespace ShareWatch
         // aplica culorile recursiv pe un control si copiii lui
         public static void Apply(Control c)
         {
+            // panouri cu derulare (Optiuni, Despre): bare de derulare in tema Windows, ca la liste
+            ScrollableControl sc = c as ScrollableControl;
+            if (sc != null && sc.AutoScroll && !(c is Form))
+                try { SetWindowTheme(c.Handle, Dark ? "DarkMode_Explorer" : "Explorer", null); } catch { }
+
             if (c is ListView)
             {
                 ListView lv = (ListView)c;
