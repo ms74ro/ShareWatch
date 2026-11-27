@@ -30,8 +30,8 @@ More screenshots (English and Romanian, light theme, made-up data) are in [docs/
 
 ## Usage
 
-1. Download `ShareWatch.exe` and put it in a folder of your choice.
-2. Run it and accept the administrator prompt.
+1. Download `ShareWatch-x.y.z.zip` from [Releases](https://github.com/ms74ro/ShareWatch/releases/latest) and extract it to a folder of your choice. The zip holds `ShareWatch.exe`, the `language` folder and the license. `ShareWatch.exe` is also attached on its own, but some browsers' web protection (Bitdefender, for example) blocks downloading a bare `.exe` from GitHub.
+2. Run `ShareWatch.exe` and accept the administrator prompt.
 3. The icon appears in the tray. Double-click it to open the window.
 
 Settings are saved in `sharewatch.ini` next to the executable (or in `%LOCALAPPDATA%\ShareWatch` if that folder is not writable).
@@ -76,7 +76,7 @@ On [VirusTotal](https://www.virustotal.com/gui/file/11278cce3645ebf923c2af328f9e
 | SecureAge | Malicious |
 | Symantec | ML.Attribute.HighConfidence |
 
-The other 62 engines report it as clean, including Microsoft, BitDefender, Kaspersky, ESET-NOD32, Avast and AVG. (Version 0.7.0 had the same 4 detections; version 0.6.2 had 5, the same 4 plus Trapmine.) On the author's PC, **Bitdefender Antivirus Plus** does not flag it either. If your antivirus does:
+The other 62 engines report it as clean, including Microsoft, BitDefender, Kaspersky, ESET-NOD32, Avast and AVG. (Version 0.7.0 had the same 4 detections; version 0.6.2 had 5, the same 4 plus Trapmine.) On the author's PC, **Bitdefender Antivirus Plus** does not flag the file itself either, but its web protection may block downloading `ShareWatch.exe` from GitHub ("Dangerous page blocked"). Download the `.zip` instead. If your antivirus does:
 
 1. Read the source code. It is all in this repository, with no external libraries.
 2. Build the executable yourself with `.\build.ps1` (see below) instead of downloading it.
