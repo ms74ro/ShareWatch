@@ -2,6 +2,9 @@
 
 All notable changes to ShareWatch are listed here, newest first.
 
+## 0.7.3
+- The GitHub address is no longer in the executable's Properties → Details. With it there, Microsoft Defender flagged the file as `Trojan:Win32/Wacatac.C!ml` (a false positive from its machine-learning model). The link stays in About.
+
 ## 0.7.2
 - About: link to the GitHub page, with the GitHub icon, next to the version history link (now with an icon too).
 - Options: the Theme and Language boxes are aligned in every language.
