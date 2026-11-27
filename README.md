@@ -47,7 +47,9 @@ language\
     fr.json
 ```
 
-To add a language:
+Ready-made language files are in the [`language`](language) folder: **Deutsch** (`de.json`), **Français** (`fr.json`), **Italiano** (`it.json`) and **Español** (`es.json`). Copy the ones you want into a `language` folder next to the executable.
+
+To add another language:
 
 1. Copy [`language/en.json`](language/en.json) as `xx.json`, where `xx` is the two-letter language code (`de.json`, `fr.json`, ...).
 2. Set `_name` to the language name as it should appear in Options (e.g. `Deutsch`).

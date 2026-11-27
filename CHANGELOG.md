@@ -5,6 +5,7 @@ All notable changes to ShareWatch are listed here, newest first.
 ## 0.7.0
 - Other languages: put `language\xx.json` next to the executable and pick the language in Options (or leave Automatic to follow Windows). Romanian and English stay built in. `language\en.json` is the template for translators; texts missing from a file are shown in English.
 - New option, off by default: open the window with a single click on the tray icon.
+- Language files for German, French, Italian and Spanish (`language\de.json`, `fr.json`, `it.json`, `es.json`).
 
 ## 0.6.2
 - "Hide administrative shares" is now on by default. An existing `sharewatch.ini` keeps the saved choice.

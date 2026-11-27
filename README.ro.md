@@ -47,7 +47,9 @@ language\
     fr.json
 ```
 
-Pentru a adăuga o limbă:
+Fișiere de limbă gata făcute se află în folderul [`language`](language): **Deutsch** (`de.json`), **Français** (`fr.json`), **Italiano** (`it.json`) și **Español** (`es.json`). Copiază-le pe cele dorite într-un folder `language` lângă executabil.
+
+Pentru a adăuga altă limbă:
 
 1. Copiază [`language/en.json`](language/en.json) cu numele `xx.json`, unde `xx` este codul limbii din două litere (`de.json`, `fr.json` etc.).
 2. Completează `_name` cu numele limbii, așa cum va apărea în Opțiuni (de ex. `Deutsch`).
