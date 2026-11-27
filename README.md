@@ -67,16 +67,16 @@ Some antivirus programs may flag `ShareWatch.exe` as suspicious. An older versio
 - it reads SMB sessions and can disconnect computers;
 - it can add a Windows Firewall rule.
 
-On [VirusTotal](https://www.virustotal.com/gui/file/4697284942fc71d46d55490e4d46cef26c2e5c7377a152d03bf3db7343a4e9b4) (version 0.7.0, November 2026), 4 of 68 engines flag it. All 4 results come from machine-learning or heuristic analysis, not from a known malware signature:
+On [VirusTotal](https://www.virustotal.com/gui/file/11278cce3645ebf923c2af328f9ea23559cb740aea0f6877b518e2352af7d440) (version 0.7.1, November 2026), 4 of 66 engines flag it. All 4 results come from machine-learning or heuristic analysis, not from a known malware signature:
 
 | Engine | Result |
 |---|---|
-| Bkav Pro | W32.Malware.9AD2C87B |
+| Bkav Pro | W32.Malware.CD2B23E1 |
 | Elastic | Malicious (high Confidence) |
 | SecureAge | Malicious |
 | Symantec | ML.Attribute.HighConfidence |
 
-The other 64 engines report it as clean, including Microsoft, BitDefender, Kaspersky, ESET-NOD32, Avast and AVG. (Version 0.6.2 had 5 detections: the same 4 plus Trapmine.) On the author's PC, **Bitdefender Antivirus Plus** does not flag it either. If your antivirus does:
+The other 62 engines report it as clean, including Microsoft, BitDefender, Kaspersky, ESET-NOD32, Avast and AVG. (Version 0.7.0 had the same 4 detections; version 0.6.2 had 5, the same 4 plus Trapmine.) On the author's PC, **Bitdefender Antivirus Plus** does not flag it either. If your antivirus does:
 
 1. Read the source code. It is all in this repository, with no external libraries.
 2. Build the executable yourself with `.\build.ps1` (see below) instead of downloading it.

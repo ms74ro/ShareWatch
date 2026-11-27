@@ -67,16 +67,16 @@ Unele programe antivirus pot semnala `ShareWatch.exe` ca suspect. O versiune mai
 - citește sesiunile SMB și poate deconecta calculatoare;
 - poate adăuga o regulă în Windows Firewall.
 
-Pe [VirusTotal](https://www.virustotal.com/gui/file/4697284942fc71d46d55490e4d46cef26c2e5c7377a152d03bf3db7343a4e9b4) (versiunea 0.7.0, noiembrie 2026), 4 din 68 de motoare o semnalează. Toate cele 4 rezultate vin din analiză euristică sau de tip machine learning, nu din semnătura unui virus cunoscut:
+Pe [VirusTotal](https://www.virustotal.com/gui/file/11278cce3645ebf923c2af328f9ea23559cb740aea0f6877b518e2352af7d440) (versiunea 0.7.1, noiembrie 2026), 4 din 66 de motoare o semnalează. Toate cele 4 rezultate vin din analiză euristică sau de tip machine learning, nu din semnătura unui virus cunoscut:
 
 | Motor | Rezultat |
 |---|---|
-| Bkav Pro | W32.Malware.9AD2C87B |
+| Bkav Pro | W32.Malware.CD2B23E1 |
 | Elastic | Malicious (high Confidence) |
 | SecureAge | Malicious |
 | Symantec | ML.Attribute.HighConfidence |
 
-Celelalte 64 de motoare o raportează ca fiind curată, printre ele Microsoft, BitDefender, Kaspersky, ESET-NOD32, Avast și AVG. (Versiunea 0.6.2 avea 5 detecții: aceleași 4 plus Trapmine.) Nici **Bitdefender Antivirus Plus**, pe PC-ul autorului, nu o semnalează. Dacă antivirusul tău o face:
+Celelalte 62 de motoare o raportează ca fiind curată, printre ele Microsoft, BitDefender, Kaspersky, ESET-NOD32, Avast și AVG. (Versiunea 0.7.0 avea aceleași 4 detecții; versiunea 0.6.2 avea 5, aceleași 4 plus Trapmine.) Nici **Bitdefender Antivirus Plus**, pe PC-ul autorului, nu o semnalează. Dacă antivirusul tău o face:
 
 1. Citește codul sursă. Este tot în acest depozit, fără biblioteci externe.
 2. Compilează singur executabilul cu `.\build.ps1` (vezi mai jos), în loc să-l descarci.
