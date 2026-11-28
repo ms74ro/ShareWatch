@@ -112,7 +112,7 @@ Capturile din README provin din varianta de test, cu partajări, calculatoare ș
 .\ShareWatch-test.exe --screenshots .\capturi
 ```
 
-Salvează câte un PNG pentru fiecare tab și pentru notificare, apoi se închide.
+Salvează câte un PNG pentru fiecare tab și pentru două notificări (una obișnuită și una pentru un calculator blocat), apoi se închide.
 
 `language/en.json` se generează din textele în engleză integrate. După ce adaugi sau modifici texte, regenerează-l cu varianta de test:
 

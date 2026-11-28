@@ -168,6 +168,9 @@ namespace ShareWatch
         ComboBox cbTheme, cbLang;
         bool loadingOpt;
 
+        // ordinea taburilor (trebuie sa corespunda cu names/glyphs din constructor)
+        const int TabMonitor = 0, TabHistory = 1, TabFolders = 2, TabOptions = 3, TabAbout = 4;
+
         public int CurrentTab { get { return current < 0 ? 0 : current; } }
         int S(int v) { return (int)Math.Round(v * sc); }
 
@@ -187,9 +190,9 @@ namespace ShareWatch
             Controls.Add(content);
             Controls.Add(bar);
 
-            string[] names = { "Monitorizare", "Foldere monitorizate", "Istoric", "Opțiuni", "Despre" };
-            // glife Segoe: ecran/monitorizare, folder, istoric, setari, informatii
-            string[] glyphs = { "", "", "", "", "" };
+            string[] names = { "Monitorizare", "Istoric", "Foldere monitorizate", "Opțiuni", "Despre" };
+            // glife Segoe: ecran/monitorizare, istoric, folder, setari, informatii
+            string[] glyphs = { "", "", "", "", "" };
             for (int i = 0; i < names.Length; i++)
             {
                 int idx = i;
@@ -203,11 +206,11 @@ namespace ShareWatch
                 content.Controls.Add(p);
             }
 
-            BuildMonitor(pages[0]);
-            BuildFolders(pages[1]);
-            BuildHistory(pages[2]);
-            BuildOptions(pages[3]);
-            BuildAbout(pages[4]);
+            BuildMonitor(pages[TabMonitor]);
+            BuildHistory(pages[TabHistory]);
+            BuildFolders(pages[TabFolders]);
+            BuildOptions(pages[TabOptions]);
+            BuildAbout(pages[TabAbout]);
 
             ApplyTheme();
             SelectTab(startTab);
@@ -284,8 +287,8 @@ namespace ShareWatch
             Theme.TitleBar(this);
             ResumeLayout(true);
             // listele cu culori proprii pe elemente trebuie reincarcate
-            if (lvShares != null && current == 1) LoadShares();
-            if (lvHist != null && current == 2) LoadHistory();
+            if (lvShares != null && current == TabFolders) LoadShares();
+            if (lvHist != null && current == TabHistory) LoadHistory();
             Invalidate(true);
         }
 
@@ -424,9 +427,9 @@ namespace ShareWatch
 
         void TickRefresh()
         {
-            if (current == 0) UpdateMonitor();
-            else if (current == 2) CheckHistoryChanged();
-            else if (current == 3)
+            if (current == TabMonitor) UpdateMonitor();
+            else if (current == TabHistory) CheckHistoryChanged();
+            else if (current == TabOptions)
             {
                 if (BlockList.Version != blockVersion) LoadBlockList();   // fisierul a fost editat din afara
                 if (lblFirewall.Text != FirewallBlock.Status && FirewallBlock.Status.Length > 0) lblFirewall.Text = FirewallBlock.Status;
@@ -436,10 +439,10 @@ namespace ShareWatch
         void RefreshTab()
         {
             if (!Visible) return;
-            if (current == 0) UpdateMonitor();
-            else if (current == 1) LoadShares();
-            else if (current == 2) LoadHistory();
-            else if (current == 3) LoadOptions();
+            if (current == TabMonitor) UpdateMonitor();
+            else if (current == TabFolders) LoadShares();
+            else if (current == TabHistory) LoadHistory();
+            else if (current == TabOptions) LoadOptions();
         }
 
         // ------------------------------------------------------------ tab Monitorizare

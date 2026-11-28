@@ -1,5 +1,5 @@
 // Doar pentru varianta de test (build.ps1 -Test): date fictive + capturi automate pentru README.
-// ShareWatch-test.exe --screenshots <folder>  -> salveaza cate un PNG pentru fiecare tab si pentru notificare, apoi iese.
+// ShareWatch-test.exe --screenshots <folder>  -> salveaza cate un PNG pentru fiecare tab si pentru notificari (normala si calculator blocat), apoi iese.
 #if TEST
 using System;
 using System.Collections.Generic;
@@ -121,14 +121,16 @@ namespace ShareWatch
 
         public static void Run(Func<MainForm> main, Action quit)
         {
-            string[] names = { "monitor", "folders", "history", "options", "about" };
-            int step = 0;
+            string[] names = { "monitor", "history", "folders", "options", "about" };   // in ordinea taburilor
+            // cateva secunde de pauza la inceput: jurnalul (tabul Istoric, al doilea) trebuie sa aiba deja intrari
+            int step = -3;
             Timer t = new Timer { Interval = 1500 };
             t.Tick += delegate
             {
                 MainForm m = main();
                 int k = step / 2;
-                if (k < names.Length)
+                if (step < 0) { }
+                else if (k < names.Length)
                 {
                     if (step % 2 == 0) { m.TopMost = true; m.SelectTab(k); m.Activate(); }
                     else Capture(m, names[k]);
@@ -137,7 +139,14 @@ namespace ShareWatch
                     Toast.ShowToast("Documente", new Peer("10.0.5.41", "PC-ANDREI"), "andrei", "\\Proiecte\\plan-2027.pdf");
                 else if (step == names.Length * 2 + 1)
                 {
-                    foreach (Form f in Application.OpenForms) if (f is Toast) { Capture(f, "toast"); break; }
+                    foreach (Form f in Application.OpenForms) if (f is Toast) { Capture(f, "toast"); f.Close(); break; }
+                }
+                else if (step == names.Length * 2 + 2)
+                    // notificarea pentru un calculator blocat (deconectat imediat)
+                    Toast.ShowToast("-", new Peer("10.0.5.99", "LAPTOP-VIZITATOR"), "guest", null, true);
+                else if (step == names.Length * 2 + 3)
+                {
+                    foreach (Form f in Application.OpenForms) if (f is Toast) { Capture(f, "toast-blocked"); break; }
                 }
                 else { t.Stop(); quit(); }
                 step++;

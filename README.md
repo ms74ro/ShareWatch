@@ -112,7 +112,7 @@ The README screenshots come from the test build with made-up shares, computers a
 .\ShareWatch-test.exe --screenshots .\shots
 ```
 
-It saves one PNG per tab plus the notification, then exits.
+It saves one PNG per tab plus two notifications (a normal one and one for a blocked computer), then exits.
 
 `language/en.json` is generated from the built-in English texts. After adding or changing texts, regenerate it with the test build:
 
