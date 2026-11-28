@@ -143,7 +143,6 @@ namespace ShareWatch
         {
             // taburi
             { "Monitorizare", "Monitoring" },
-            { "Foldere monitorizate", "Monitored folders" },
             { "Istoric", "History" },
             { "Opțiuni", "Options" },
             { "Despre", "About" },

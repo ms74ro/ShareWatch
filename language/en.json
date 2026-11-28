@@ -1,8 +1,7 @@
 {
   "_name": "English",
-  "_info": "ShareWatch 0.7.0 - copy this file as xx.json (xx = language code, e.g. de.json), set _name and translate only the values. Keep the keys (Romanian text) and {0}, {1} unchanged.",
+  "_info": "ShareWatch 0.7.5 - copy this file as xx.json (xx = language code, e.g. de.json), set _name and translate only the values. Keep the keys (Romanian text) and {0}, {1} unchanged.",
   "Monitorizare": "Monitoring",
-  "Foldere monitorizate": "Monitored folders",
   "Istoric": "History",
   "Opțiuni": "Options",
   "Despre": "About",

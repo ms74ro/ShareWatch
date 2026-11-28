@@ -14,7 +14,7 @@ More screenshots (English and Romanian, light theme, made-up data) are in [docs/
 
 - **Live notifications** when a computer connects to a shared folder, with IP and computer name, optional subtle sound and configurable duration.
 - **Monitoring tab**: the computers connected right now. Right-click one to disconnect or block it.
-- **Monitored folders**: choose which shares are watched. Share a new folder or stop sharing one directly from the app.
+- **Shared folders**: choose which shares are monitored. Share a new folder or stop sharing one directly from the app.
 - **Hide administrative shares** (C$, ADMIN$ etc.) from the lists and tray menu. On by default.
 - **Block list**: listed computers are disconnected as soon as they connect. Stored in `blocklist.txt`, editable in the app or in the file.
 - **Optional Windows Firewall blocking**: one inbound rule (`ShareWatch - blocare SMB`) blocks TCP 139/445 from blocked IPs.
@@ -67,18 +67,19 @@ Some antivirus programs may flag `ShareWatch.exe` as suspicious. An older versio
 - it reads SMB sessions and can disconnect computers;
 - it can add a Windows Firewall rule.
 
-On [VirusTotal](https://www.virustotal.com/gui/file/3a21c3c431f50ad4397db66063d9fdff5c71fa2c419bb10d9c05c7be6c374738) (version 0.7.3, November 2026), 4 of 68 engines flag it. All 4 results come from machine-learning or heuristic analysis, not from a known malware signature:
+On [VirusTotal](https://www.virustotal.com/gui/file/08e83c2792a22b23a92722e4d9c73ac6886c87afc4611485e621411f9b47aa4b) (version 0.7.4, November 2026), 5 of 68 engines flag it. All 5 results come from machine-learning or heuristic analysis, not from a known malware signature:
 
 | Engine | Result |
 |---|---|
-| Bkav Pro | W32.Malware.39949BE6 |
-| Elastic | Malicious (moderate Confidence) |
+| Bkav Pro | W32.Malware.E414854D |
+| Elastic | Malicious (high Confidence) |
+| Microsoft | Trojan:Win32/Wacatac.C!ml |
 | SecureAge | Malicious |
 | Symantec | ML.Attribute.HighConfidence |
 
-The other 64 engines report it as clean, including Microsoft, BitDefender, Kaspersky, ESET-NOD32, Avast and AVG. Versions 0.7.0 and 0.7.1 had the same 4 detections; version 0.6.2 had 5 (the same 4 plus Trapmine).
+The other 63 engines report it as clean, including BitDefender, Kaspersky, ESET-NOD32, Avast and AVG.
 
-Version 0.7.2 (withdrawn) was also flagged by Microsoft as `Trojan:Win32/Wacatac.C!ml`. The cause was the GitHub address in the executable's version details; the same build without it was not flagged, so 0.7.3 removed it. The `!ml` suffix means a machine-learning model, not a signature, so such a detection can appear or disappear from one build to the next. If **Microsoft Defender** ever blocks or quarantines the file, you can restore it from Windows Security → Protection history and report it as a false positive at [Microsoft's file submission page](https://www.microsoft.com/en-us/wdsi/filesubmission).
+The Microsoft result comes and goes between builds: 0.7.2 and 0.7.4 were flagged, 0.7.0, 0.7.1 and 0.7.3 were not, with almost the same code. The `!ml` suffix means a machine-learning model, not a signature, so it scores each new build afresh. In practice **Microsoft Defender** may block or quarantine the file. If that happens, you can restore it from Windows Security → Protection history and report it as a false positive at [Microsoft's file submission page](https://www.microsoft.com/en-us/wdsi/filesubmission).
 
 On the author's PC, **Bitdefender Antivirus Plus** does not flag the file, but its web protection blocked downloading the bare `ShareWatch.exe` from GitHub ("Dangerous page blocked"), which is why releases ship as a `.zip`.
 

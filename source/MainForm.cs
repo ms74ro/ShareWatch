@@ -1,4 +1,4 @@
-// Fereastra principala cu taburi: Monitorizare | Foldere monitorizate | Istoric | Optiuni | Despre
+// Fereastra principala cu taburi: Monitorizare | Istoric | Foldere partajate | Optiuni | Despre
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -190,7 +190,7 @@ namespace ShareWatch
             Controls.Add(content);
             Controls.Add(bar);
 
-            string[] names = { "Monitorizare", "Istoric", "Foldere monitorizate", "Opțiuni", "Despre" };
+            string[] names = { "Monitorizare", "Istoric", "Foldere partajate", "Opțiuni", "Despre" };
             // glife Segoe: ecran/monitorizare, istoric, folder, setari, informatii
             string[] glyphs = { "", "", "", "", "" };
             for (int i = 0; i < names.Length; i++)
@@ -564,7 +564,7 @@ namespace ShareWatch
             UpdateMonitor();
         }
 
-        // ------------------------------------------------------------ tab Foldere monitorizate
+        // ------------------------------------------------------------ tab Foldere partajate
         void BuildFolders(Panel page)
         {
             lvShares = NewList(new string[] { "Folder partajat", "Cale locală", "Tip", "Comentariu" }, new int[] { 200, 420, 130, 200 });

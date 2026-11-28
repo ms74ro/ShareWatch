@@ -21,17 +21,17 @@ using System.Windows.Forms;
 [assembly: AssemblyTitle("ShareWatch")]
 [assembly: AssemblyDescription("Monitorizare accesari foldere partajate")]
 [assembly: AssemblyProduct("ShareWatch")]
-// Fara URL in informatiile de versiune: un link aici (Company/Copyright) a declansat detectia
-// Microsoft Defender Trojan:Win32/Wacatac.C!ml pe VirusTotal (0.7.2). Linkul e in Despre.
+// Fara URL in informatiile de versiune (scos in 0.7.3). Detectia Microsoft Trojan:Win32/Wacatac.C!ml
+// de pe VirusTotal apare si dispare de la o compilare la alta (si fara URL, la 0.7.4). Linkul e in Despre.
 [assembly: AssemblyCopyright("by ms74ro & Claude")]
-[assembly: AssemblyVersion("0.7.4.0")]
-[assembly: AssemblyFileVersion("0.7.4.0")]
+[assembly: AssemblyVersion("0.7.5.0")]
+[assembly: AssemblyFileVersion("0.7.5.0")]
 
 namespace ShareWatch
 {
     static class AppInfo
     {
-        public const string Version = "0.7.4";
+        public const string Version = "0.7.5";
         public const string RepoUrl = "https://github.com/ms74ro/ShareWatch";
         // Istoricul versiunilor e in CHANGELOG.md (nu mai e inclus in exe).
         // Cand proiectul ajunge pe GitHub, pune aici adresa fisierului; daca e completata, linkul din Despre o foloseste.

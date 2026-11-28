@@ -14,7 +14,7 @@ Alte capturi (în engleză și română, temă luminoasă, date fictive) sunt î
 
 - **Notificări în timp real** când un calculator se conectează la un folder partajat, cu IP și nume, sunet discret opțional și durată configurabilă.
 - **Tab Monitorizare**: calculatoarele conectate acum. Clic dreapta pe unul pentru a-l deconecta sau bloca.
-- **Foldere monitorizate**: alegi ce partajări sunt urmărite. Poți partaja un folder nou sau opri o partajare direct din aplicație.
+- **Foldere partajate**: alegi ce partajări sunt monitorizate. Poți partaja un folder nou sau opri o partajare direct din aplicație.
 - **Ascunde partajările administrative** (C$, ADMIN$ etc.) din liste și din meniul tray. Activat implicit.
 - **Listă de blocare**: calculatoarele din listă sunt deconectate imediat ce se conectează. Salvată în `blocklist.txt`, editabilă din aplicație sau direct în fișier.
 - **Blocare opțională în Windows Firewall**: o regulă de intrare (`ShareWatch - blocare SMB`) blochează TCP 139/445 de la IP-urile blocate.
@@ -67,18 +67,19 @@ Unele programe antivirus pot semnala `ShareWatch.exe` ca suspect. O versiune mai
 - citește sesiunile SMB și poate deconecta calculatoare;
 - poate adăuga o regulă în Windows Firewall.
 
-Pe [VirusTotal](https://www.virustotal.com/gui/file/3a21c3c431f50ad4397db66063d9fdff5c71fa2c419bb10d9c05c7be6c374738) (versiunea 0.7.3, noiembrie 2026), 4 din 68 de motoare o semnalează. Toate cele 4 rezultate vin din analiză euristică sau de tip machine learning, nu din semnătura unui virus cunoscut:
+Pe [VirusTotal](https://www.virustotal.com/gui/file/08e83c2792a22b23a92722e4d9c73ac6886c87afc4611485e621411f9b47aa4b) (versiunea 0.7.4, noiembrie 2026), 5 din 68 de motoare o semnalează. Toate cele 5 rezultate vin din analiză euristică sau de tip machine learning, nu din semnătura unui virus cunoscut:
 
 | Motor | Rezultat |
 |---|---|
-| Bkav Pro | W32.Malware.39949BE6 |
-| Elastic | Malicious (moderate Confidence) |
+| Bkav Pro | W32.Malware.E414854D |
+| Elastic | Malicious (high Confidence) |
+| Microsoft | Trojan:Win32/Wacatac.C!ml |
 | SecureAge | Malicious |
 | Symantec | ML.Attribute.HighConfidence |
 
-Celelalte 64 de motoare o raportează ca fiind curată, printre ele Microsoft, BitDefender, Kaspersky, ESET-NOD32, Avast și AVG. Versiunile 0.7.0 și 0.7.1 aveau aceleași 4 detecții; versiunea 0.6.2 avea 5 (aceleași 4 plus Trapmine).
+Celelalte 63 de motoare o raportează ca fiind curată, printre ele BitDefender, Kaspersky, ESET-NOD32, Avast și AVG.
 
-Versiunea 0.7.2 (retrasă) era semnalată și de Microsoft, ca `Trojan:Win32/Wacatac.C!ml`. Cauza a fost adresa GitHub din detaliile de versiune ale executabilului: aceeași compilare fără ea nu a fost semnalată, așa că 0.7.3 a scos-o. Sufixul `!ml` înseamnă un model de machine learning, nu o semnătură, deci o astfel de detecție poate apărea sau dispărea de la o compilare la alta. Dacă **Microsoft Defender** blochează vreodată fișierul sau îl pune în carantină, îl poți restaura din Securitate Windows → Istoricul protecției și îl poți raporta ca alertă falsă pe [pagina Microsoft de trimitere a fișierelor](https://www.microsoft.com/en-us/wdsi/filesubmission).
+Detecția Microsoft apare și dispare de la o compilare la alta: 0.7.2 și 0.7.4 au fost semnalate, 0.7.0, 0.7.1 și 0.7.3 nu, cu aproape același cod. Sufixul `!ml` înseamnă un model de machine learning, nu o semnătură, deci fiecare compilare nouă e evaluată de la zero. Practic, **Microsoft Defender** poate bloca fișierul sau îl poate pune în carantină. Dacă se întâmplă asta, îl poți restaura din Securitate Windows → Istoricul protecției și îl poți raporta ca alertă falsă pe [pagina Microsoft de trimitere a fișierelor](https://www.microsoft.com/en-us/wdsi/filesubmission).
 
 Pe PC-ul autorului, **Bitdefender Antivirus Plus** nu semnalează fișierul, dar protecția web Bitdefender a blocat descărcarea exe-ului simplu de pe GitHub („Dangerous page blocked”). De aceea, release-urile se publică ca arhivă `.zip`.
 

@@ -2,11 +2,14 @@
 
 All notable changes to ShareWatch are listed here, newest first.
 
+## 0.7.5
+- The "Monitored folders" tab is now called "Shared folders".
+
 ## 0.7.4
 - The History tab now comes right after Monitoring.
 
 ## 0.7.3
-- The GitHub address is no longer in the executable's Properties → Details. With it there, Microsoft Defender flagged the file as `Trojan:Win32/Wacatac.C!ml` (a false positive from its machine-learning model). The link stays in About.
+- The GitHub address is no longer in the executable's Properties → Details, because 0.7.2 (with it) was flagged by Microsoft Defender as `Trojan:Win32/Wacatac.C!ml` and a test build without it was not. 0.7.4 was flagged again without the address, so this machine-learning false positive simply varies between builds. The link stays in About.
 
 ## 0.7.2
 - About: link to the GitHub page, with the GitHub icon, next to the version history link (now with an icon too).
