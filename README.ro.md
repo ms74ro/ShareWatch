@@ -51,10 +51,11 @@ Fișiere de limbă gata făcute se află în folderul [`language`](language): **
 
 Cel mai simplu adaugi o limbă nouă cu **`language/translate.html`** (inclus și în arhiva din release). Deschide-l într-un browser; nu e nevoie de internet sau de server:
 
-1. Completează codul limbii (de ex. `pl`), numele limbii așa cum va apărea în Opțiuni (de ex. `Polski`) și, dacă vrei, numele tău ca traducător.
-2. Alege limba din care traduci (implicit engleza, sau româna, germana, franceza, italiana, spaniola).
-3. Scrie traducerea sub fiecare text. Marcajele de tipul `{0}` trebuie păstrate; pagina te avertizează dacă lipsește unul. Lucrul tău rămâne salvat în browser până apeși **Clear**, iar **Open file…** încarcă un `xx.json` existent, ca să-l continui sau să-l corectezi.
-4. Apasă **Download .json**, pune fișierul în folderul `language` de lângă `ShareWatch.exe`, repornește ShareWatch și alege limba din Opțiuni → Limbă.
+1. Prima dată alege folderul `language` (cel care conține `en.json`). Browserul nu lasă o pagină să citească singură fișiere; acestea sunt doar citite, nu încărcate nicăieri, iar pagina le ține minte. **Reload files…** citește din nou folderul după o actualizare.
+2. Completează codul limbii (de ex. `pl`), numele limbii așa cum va apărea în Opțiuni (de ex. `Polski`) și, dacă vrei, numele tău ca traducător.
+3. Alege limba din care traduci (implicit engleza, sau româna, germana, franceza, italiana, spaniola).
+4. Scrie traducerea sub fiecare text. Marcajele de tipul `{0}` trebuie păstrate; pagina te avertizează dacă lipsește unul. Lucrul tău rămâne salvat în browser până apeși **Clear**, iar **Open file…** încarcă un `xx.json` existent, ca să-l continui sau să-l corectezi.
+5. Apasă **Download .json**, pune fișierul în folderul `language` de lângă `ShareWatch.exe`, repornește ShareWatch și alege limba din Opțiuni → Limbă.
 
 Sau manual:
 
@@ -144,7 +145,6 @@ Salvează câte un PNG pentru fiecare tab și pentru două notificări (una obi�
 | `source/app.manifest` | Manifestul de administrator |
 | `language/` | Fișierele de limbă (`en.json` este modelul) |
 | `language/translate.html` | Pagina de traducere (se deschide în browser) |
-| `source/translate-data.ps1` | Copiază fișierele de limbă în `translate.html` (rulat de `build.ps1`) |
 
 ## Modificări
 

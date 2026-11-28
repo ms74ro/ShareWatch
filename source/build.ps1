@@ -42,8 +42,6 @@ $args += (Join-Path $here 'Firewall.cs')
 if ($Test) { $args += (Join-Path $here 'Demo.cs') }
 & $csc @args
 if ($LASTEXITCODE -ne 0) { throw "Compilare esuata" }
-# pagina de traducere (language\translate.html) primeste fisierele de limba actuale
-& (Join-Path $here 'translate-data.ps1')
 Get-Item (Join-Path $here $out) | Select-Object Name, Length, @{n='Versiune';e={$_.VersionInfo.FileVersion}}
 
 

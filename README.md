@@ -51,10 +51,11 @@ Ready-made language files are in the [`language`](language) folder: **Deutsch** 
 
 To add another language, the easiest way is **`language/translate.html`** (also in the release zip). Open it in a browser; no internet or server is needed:
 
-1. Enter the language code (e.g. `pl`), the language name as it should appear in Options (e.g. `Polski`) and, if you like, your name as translator.
-2. Choose which language to translate from (English by default, or Romanian, German, French, Italian, Spanish).
-3. Write the translation under each text. Markers such as `{0}` must stay; the page warns if one is missing. Your work is kept in the browser until you press **Clear**, and **Open file…** loads an existing `xx.json` to continue or correct it.
-4. Press **Download .json**, put the file in the `language` folder next to `ShareWatch.exe`, restart ShareWatch and pick the language in Options → Language.
+1. The first time, choose the `language` folder (the one that holds `en.json`). A browser does not let a page read files by itself; the files are only read, not uploaded, and the page remembers them. **Reload files…** reads the folder again after an update.
+2. Enter the language code (e.g. `pl`), the language name as it should appear in Options (e.g. `Polski`) and, if you like, your name as translator.
+3. Choose which language to translate from (English by default, or Romanian, German, French, Italian, Spanish).
+4. Write the translation under each text. Markers such as `{0}` must stay; the page warns if one is missing. Your work is kept in the browser until you press **Clear**, and **Open file…** loads an existing `xx.json` to continue or correct it.
+5. Press **Download .json**, put the file in the `language` folder next to `ShareWatch.exe`, restart ShareWatch and pick the language in Options → Language.
 
 To do it by hand instead:
 
@@ -144,7 +145,6 @@ It saves one PNG per tab plus two notifications (a normal one and one for a bloc
 | `source/app.manifest` | Administrator manifest |
 | `language/` | Language files (`en.json` is the template) |
 | `language/translate.html` | Translation page (opens in a browser) |
-| `source/translate-data.ps1` | Copies the language files into `translate.html` (run by `build.ps1`) |
 
 ## Changes
 
