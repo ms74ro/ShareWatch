@@ -67,19 +67,18 @@ Unele programe antivirus pot semnala `ShareWatch.exe` ca suspect. O versiune mai
 - citește sesiunile SMB și poate deconecta calculatoare;
 - poate adăuga o regulă în Windows Firewall.
 
-Pe [VirusTotal](https://www.virustotal.com/gui/file/08e83c2792a22b23a92722e4d9c73ac6886c87afc4611485e621411f9b47aa4b) (versiunea 0.7.4, noiembrie 2026), 5 din 68 de motoare o semnalează. Toate cele 5 rezultate vin din analiză euristică sau de tip machine learning, nu din semnătura unui virus cunoscut:
+Pe [VirusTotal](https://www.virustotal.com/gui/file/55ab4eef7eeed847c3fe917e03a539449a300ee72e529910a2dc4240c6feacb8) (versiunea 0.7.5, noiembrie 2026), 4 din 68 de motoare o semnalează. Toate cele 4 rezultate vin din analiză euristică sau de tip machine learning, nu din semnătura unui virus cunoscut:
 
 | Motor | Rezultat |
 |---|---|
-| Bkav Pro | W32.Malware.E414854D |
+| Bkav Pro | W32.Malware.3E1835B4 |
 | Elastic | Malicious (high Confidence) |
-| Microsoft | Trojan:Win32/Wacatac.C!ml |
 | SecureAge | Malicious |
 | Symantec | ML.Attribute.HighConfidence |
 
-Celelalte 63 de motoare o raportează ca fiind curată, printre ele BitDefender, Kaspersky, ESET-NOD32, Avast și AVG.
+Celelalte 64 de motoare o raportează ca fiind curată, printre ele Microsoft, BitDefender, Kaspersky, ESET-NOD32, Avast și AVG.
 
-Detecția Microsoft apare și dispare de la o compilare la alta: 0.7.2 și 0.7.4 au fost semnalate, 0.7.0, 0.7.1 și 0.7.3 nu, cu aproape același cod. Sufixul `!ml` înseamnă un model de machine learning, nu o semnătură, deci fiecare compilare nouă e evaluată de la zero. Practic, **Microsoft Defender** poate bloca fișierul sau îl poate pune în carantină. Dacă se întâmplă asta, îl poți restaura din Securitate Windows → Istoricul protecției și îl poți raporta ca alertă falsă pe [pagina Microsoft de trimitere a fișierelor](https://www.microsoft.com/en-us/wdsi/filesubmission).
+Microsoft Defender (`Trojan:Win32/Wacatac.C!ml`) semnalează unele compilări și altele nu, cu aproape același cod: 0.7.2 și 0.7.4 (ambele retrase) au fost semnalate; 0.7.0, 0.7.1, 0.7.3 și 0.7.5 nu. Sufixul `!ml` înseamnă un model de machine learning, nu o semnătură, deci fiecare compilare nouă e evaluată de la zero. Dacă **Microsoft Defender** blochează vreodată fișierul sau îl pune în carantină, îl poți restaura din Securitate Windows → Istoricul protecției și îl poți raporta ca alertă falsă pe [pagina Microsoft de trimitere a fișierelor](https://www.microsoft.com/en-us/wdsi/filesubmission).
 
 Pe PC-ul autorului, **Bitdefender Antivirus Plus** nu semnalează fișierul, dar protecția web Bitdefender a blocat descărcarea exe-ului simplu de pe GitHub („Dangerous page blocked”). De aceea, release-urile se publică ca arhivă `.zip`.
 

@@ -67,19 +67,18 @@ Some antivirus programs may flag `ShareWatch.exe` as suspicious. An older versio
 - it reads SMB sessions and can disconnect computers;
 - it can add a Windows Firewall rule.
 
-On [VirusTotal](https://www.virustotal.com/gui/file/08e83c2792a22b23a92722e4d9c73ac6886c87afc4611485e621411f9b47aa4b) (version 0.7.4, November 2026), 5 of 68 engines flag it. All 5 results come from machine-learning or heuristic analysis, not from a known malware signature:
+On [VirusTotal](https://www.virustotal.com/gui/file/55ab4eef7eeed847c3fe917e03a539449a300ee72e529910a2dc4240c6feacb8) (version 0.7.5, November 2026), 4 of 68 engines flag it. All 4 results come from machine-learning or heuristic analysis, not from a known malware signature:
 
 | Engine | Result |
 |---|---|
-| Bkav Pro | W32.Malware.E414854D |
+| Bkav Pro | W32.Malware.3E1835B4 |
 | Elastic | Malicious (high Confidence) |
-| Microsoft | Trojan:Win32/Wacatac.C!ml |
 | SecureAge | Malicious |
 | Symantec | ML.Attribute.HighConfidence |
 
-The other 63 engines report it as clean, including BitDefender, Kaspersky, ESET-NOD32, Avast and AVG.
+The other 64 engines report it as clean, including Microsoft, BitDefender, Kaspersky, ESET-NOD32, Avast and AVG.
 
-The Microsoft result comes and goes between builds: 0.7.2 and 0.7.4 were flagged, 0.7.0, 0.7.1 and 0.7.3 were not, with almost the same code. The `!ml` suffix means a machine-learning model, not a signature, so it scores each new build afresh. In practice **Microsoft Defender** may block or quarantine the file. If that happens, you can restore it from Windows Security → Protection history and report it as a false positive at [Microsoft's file submission page](https://www.microsoft.com/en-us/wdsi/filesubmission).
+Microsoft Defender (`Trojan:Win32/Wacatac.C!ml`) flags some builds and not others, with almost the same code: 0.7.2 and 0.7.4 (both withdrawn) were flagged; 0.7.0, 0.7.1, 0.7.3 and 0.7.5 were not. The `!ml` suffix means a machine-learning model, not a signature, so it scores each new build afresh. If **Microsoft Defender** ever blocks or quarantines the file, you can restore it from Windows Security → Protection history and report it as a false positive at [Microsoft's file submission page](https://www.microsoft.com/en-us/wdsi/filesubmission).
 
 On the author's PC, **Bitdefender Antivirus Plus** does not flag the file, but its web protection blocked downloading the bare `ShareWatch.exe` from GitHub ("Dangerous page blocked"), which is why releases ship as a `.zip`.
 
