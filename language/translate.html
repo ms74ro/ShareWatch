@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ShareWatch – translate</title>
+<style>
+  :root {
+    --bg: #f3f4f6; --card: #ffffff; --fg: #1f2328; --muted: #656d76; --border: #d0d7de;
+    --accent: #1a7f37; --accent-fg: #ffffff; --warn: #9a6700; --warn-bg: #fff8c5; --bad: #cf222e;
+    --input: #ffffff; --done: #dafbe1;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0d1117; --card: #161b22; --fg: #e6edf3; --muted: #8d96a0; --border: #30363d;
+      --accent: #2ea043; --accent-fg: #ffffff; --warn: #d29922; --warn-bg: #2b2111; --bad: #f85149;
+      --input: #0d1117; --done: #12261e;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.45 "Segoe UI", system-ui, sans-serif; }
+  header {
+    position: sticky; top: 0; z-index: 5; background: var(--card); border-bottom: 1px solid var(--border);
+    padding: 12px 20px; box-shadow: 0 2px 6px rgba(0,0,0,.06);
+  }
+  .wrap { max-width: 920px; margin: 0 auto; }
+  .title { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+  .title h1 { font-size: 20px; margin: 0; font-weight: 600; }
+  .target { font-size: 20px; font-weight: 600; color: var(--accent); }
+  .target.empty { color: var(--muted); font-weight: 400; font-size: 15px; }
+  .fields { display: grid; grid-template-columns: 110px 1fr 1fr 170px; gap: 10px; }
+  .fields label { display: flex; flex-direction: column; font-size: 12px; color: var(--muted); gap: 3px; }
+  input, select, textarea {
+    font: inherit; color: var(--fg); background: var(--input); border: 1px solid var(--border);
+    border-radius: 6px; padding: 6px 8px;
+  }
+  input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); outline-offset: -1px; border-color: transparent; }
+  #code { text-transform: lowercase; }
+  .bar { display: flex; align-items: center; gap: 14px; margin-top: 10px; flex-wrap: wrap; }
+  .progress { flex: 1; min-width: 160px; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+  .progress > div { height: 100%; width: 0; background: var(--accent); transition: width .2s; }
+  .count { font-size: 13px; color: var(--muted); white-space: nowrap; }
+  .bar label { font-size: 13px; display: flex; align-items: center; gap: 5px; white-space: nowrap; }
+  button {
+    font: inherit; border: 1px solid var(--border); background: var(--card); color: var(--fg);
+    border-radius: 6px; padding: 6px 12px; cursor: pointer;
+  }
+  button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); font-weight: 600; }
+  button:hover { filter: brightness(1.05); }
+  main { padding: 18px 20px 60px; }
+  .intro { color: var(--muted); font-size: 13.5px; margin: 0 0 16px; }
+  .intro code { background: var(--card); border: 1px solid var(--border); border-radius: 4px; padding: 0 4px; }
+  .item { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; margin-bottom: 8px; }
+  .item.done { border-left: 4px solid var(--accent); }
+  .src { white-space: pre-wrap; margin-bottom: 4px; }
+  .src .fb { font-size: 11px; color: var(--muted); margin-left: 6px; }
+  .item textarea { width: 100%; resize: vertical; min-height: 36px; display: block; }
+  .ph { color: var(--accent); font-weight: 600; }
+  .warn { display: none; margin-top: 6px; font-size: 12.5px; color: var(--warn); background: var(--warn-bg); border-radius: 4px; padding: 3px 8px; }
+  .warn.on { display: block; }
+  .msg { font-size: 13px; color: var(--bad); }
+  .hidden { display: none; }
+  @media (max-width: 720px) { .fields { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 480px) { .fields { grid-template-columns: 1fr; } header { position: static; } }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="title">
+      <h1>ShareWatch – translation</h1>
+      <span id="target" class="target empty">enter the language code below</span>
+    </div>
+    <div class="fields">
+      <label>Language code<input id="code" maxlength="3" placeholder="pl" autocomplete="off"></label>
+      <label>Language name (as shown in Options)<input id="name" placeholder="Polski" autocomplete="off"></label>
+      <label>Translated by<input id="author" placeholder="your name" autocomplete="off"></label>
+      <label>Translate from<select id="source"></select></label>
+    </div>
+    <div class="bar">
+      <div class="progress"><div id="prog"></div></div>
+      <span id="count" class="count"></span>
+      <label><input type="checkbox" id="onlyEmpty"> only untranslated</label>
+      <button id="open" title="Continue or correct an existing xx.json">Open file…</button>
+      <button id="clear" title="Start over">Clear</button>
+      <button id="save" class="primary">Download .json</button>
+      <input type="file" id="file" accept=".json,application/json" class="hidden">
+    </div>
+    <div id="msg" class="msg"></div>
+  </div>
+</header>
+<main>
+  <div class="wrap">
+    <p class="intro">
+      Write the translation under each text. Keep <span class="ph">{0}</span>, <span class="ph">{1}</span> where they are
+      (the program puts names and numbers there). Your work is kept in this browser until you press Clear.
+      When done, press <b>Download .json</b> and put the file in the <code>language</code> folder next to
+      <code>ShareWatch.exe</code>, then restart ShareWatch and pick the language in Options → Language.
+      Texts left empty are shown in English.
+    </p>
+    <div id="list"></div>
+  </div>
+</main>
+
+<script>
+// Built-in language files (keys = Romanian texts). Refreshed by source\translate-data.ps1, run from build.ps1.
+const LANGS = /*DATA*/{"de": {
+  "_name": "Deutsch",
+  "_info": "ShareWatch 0.7.0 - Deutsch translation. Keys are the Romanian texts; translate only the values.",
+  "Monitorizare": "Überwachung",
+  "Istoric": "Verlauf",
+  "Opțiuni": "Optionen",
+  "Despre": "Info",
+  "Calculator (PC)": "Computer (PC)",
+  "Utilizator": "Benutzer",
+  "Partajare": "Freigabe",
+  "Conectat de la": "Verbunden seit",
+  "Fișier / folder deschis": "Geöffnete Datei / Ordner",
+  "Folder partajat": "Freigegebener Ordner",
+  "Cale locală": "Lokaler Pfad",
+  "Tip": "Typ",
+  "Comentariu": "Kommentar",
+  "Data / ora": "Datum / Uhrzeit",
+  "Eveniment": "Ereignis",
+  "Cale / detalii": "Pfad / Details",
+  "CONECTARE": "VERBINDUNG",
+  "FISIER": "DATEI",
+  "DECONECTARE": "TRENNUNG",
+  "ACTIV": "AKTIV",
+  "EROARE": "FEHLER",
+  "necunoscut": "unbekannt",
+  "ACCES LA FOLDER PARTAJAT": "ZUGRIFF AUF FREIGEGEBENEN ORDNER",
+  "Utilizator: ": "Benutzer: ",
+  "utilizator": "Benutzer",
+  "Deschide fereastra": "Fenster öffnen",
+  "Foldere partajate": "Freigegebene Ordner",
+  "Deschide jurnalul": "Protokoll öffnen",
+  "Notificări": "Benachrichtigungen",
+  "Ignoră accesările de pe acest calculator": "Zugriffe von diesem Computer ignorieren",
+  "Pornește automat cu Windows": "Mit Windows starten",
+  "Test notificare": "Testbenachrichtigung",
+  "Ieșire": "Beenden",
+  " - monitorizare activă": " - Überwachung aktiv",
+  "Ultimul acces: ": "Letzter Zugriff: ",
+  "Eroare: acces refuzat - rulează ca Administrator": "Fehler: Zugriff verweigert - als Administrator ausführen",
+  "Eroare netapi32: {0}": "netapi32-Fehler: {0}",
+  "Acces refuzat. Rulează aplicația ca Administrator pentru a vedea accesările.": "Zugriff verweigert. Starten Sie die Anwendung als Administrator, um die Zugriffe zu sehen.",
+  "(nu pot citi lista)": "(Liste kann nicht gelesen werden)",
+  "(niciun folder partajat)": "(keine freigegebenen Ordner)",
+  "Pornește automat la autentificare, direct în tray.": "Startet automatisch bei der Anmeldung, direkt im Infobereich.",
+  "Pornirea automată a fost dezactivată.": "Der automatische Start wurde deaktiviert.",
+  "Nu am putut modifica pornirea automată (rulează ca Administrator).": "Der automatische Start konnte nicht geändert werden (als Administrator ausführen).",
+  " - monitorizare foldere partajate": " - Überwachung freigegebener Ordner",
+  "Acces refuzat - rulează aplicația ca Administrator pentru a vedea conexiunile.": "Zugriff verweigert - starten Sie die Anwendung als Administrator, um die Verbindungen zu sehen.",
+  "Eroare la citirea conexiunilor (netapi32: {0}).": "Fehler beim Lesen der Verbindungen (netapi32: {0}).",
+  "Conectați acum ({0})": "Jetzt verbunden ({0})",
+  "Fișiere deschise acum ({0})": "Jetzt geöffnete Dateien ({0})",
+  "Bifează folderele partajate care vor fi monitorizate (notificări și jurnal). Modificările se aplică imediat. Partajările administrative (C$, ADMIN$ etc.) sunt dezactivate implicit.": "Wählen Sie die freigegebenen Ordner aus, die überwacht werden sollen (Benachrichtigungen und Protokoll). Änderungen gelten sofort. Administrative Freigaben (C$, ADMIN$ usw.) sind standardmäßig deaktiviert.",
+  "Reîmprospătează": "Aktualisieren",
+  "Bifează tot": "Alle auswählen",
+  "Debifează tot": "Alle abwählen",
+  "Administrativ": "Administrativ",
+  "Filtru:": "Filter:",
+  "Eveniment:": "Ereignis:",
+  "Toate": "Alle",
+  "Deschide în Notepad": "Im Editor öffnen",
+  "Golește jurnalul": "Protokoll leeren",
+  "Ștergi tot conținutul jurnalului? Operația nu poate fi anulată.": "Gesamtes Protokoll löschen? Dies kann nicht rückgängig gemacht werden.",
+  "{0} înregistrări": "{0} Einträge",
+  " (afișate ultimele {0})": " (die letzten {0} werden angezeigt)",
+  "Afișează notificare la accesarea folderelor partajate": "Benachrichtigung bei Zugriff auf freigegebene Ordner anzeigen",
+  "Sunet discret la notificare": "Dezenter Ton bei Benachrichtigung",
+  "Ignoră accesările făcute de pe acest calculator": "Zugriffe von diesem Computer ignorieren",
+  "Pornește automat cu Windows (în tray, cu drepturi de administrator, fără UAC)": "Mit Windows starten (im Infobereich, mit Administratorrechten, ohne UAC-Abfrage)",
+  "Durata notificării (secunde):": "Anzeigedauer der Benachrichtigung (Sekunden):",
+  "Pauză între notificările pentru fișiere, același PC și folder (secunde):": "Pause zwischen Dateibenachrichtigungen für denselben PC und Ordner (Sekunden):",
+  "Automat (ca Windows)": "Automatisch (wie Windows)",
+  "Luminos": "Hell",
+  "Întunecat": "Dunkel",
+  "Temă:": "Design:",
+  "Limbă:": "Sprache:",
+  "Deschide fereastra cu un singur clic pe iconița din tray": "Fenster mit einem einfachen Klick auf das Symbol im Infobereich öffnen",
+  "Alte limbi: fișiere language\\xx.json lângă executabil (vezi README).": "Weitere Sprachen: Dateien language\\xx.json neben der Programmdatei (siehe README).",
+  "Setările se salvează automat în sharewatch.ini, lângă executabil. Închiderea ferestrei (X) lasă aplicația activă în tray; pentru oprire folosește Ieșire din meniul iconiței din tray.": "Die Einstellungen werden automatisch in sharewatch.ini neben der Programmdatei gespeichert. Das Schließen des Fensters (X) lässt die Anwendung im Infobereich weiterlaufen; zum Beenden verwenden Sie Beenden im Menü des Symbols.",
+  "Nu am putut modifica pornirea automată. Rulează aplicația ca Administrator.": "Der automatische Start konnte nicht geändert werden. Starten Sie die Anwendung als Administrator.",
+  "Versiunea ": "Version ",
+  "Monitorizează accesările la folderele partajate (SMB) ale acestui calculator: afișează notificări cu IP-ul și numele calculatorului care accesează și păstrează un jurnal al accesărilor.": "Überwacht die Zugriffe auf die freigegebenen Ordner (SMB) dieses Computers: zeigt Benachrichtigungen mit der IP-Adresse und dem Namen des zugreifenden Computers an und führt ein Zugriffsprotokoll.",
+  "Calculator: ": "Computer: ",
+  "Drepturi de administrator: ": "Administratorrechte: ",
+  "da": "ja",
+  "NU (monitorizarea nu va funcționa)": "NEIN (die Überwachung funktioniert nicht)",
+  "Jurnal: ": "Protokoll: ",
+  "Executabil: ": "Programmdatei: ",
+  "Istoric versiuni": "Versionsverlauf",
+  "DECONECTAT": "GETRENNT",
+  "BLOCAT": "GESPERRT",
+  "CONEXIUNE BLOCATĂ": "VERBINDUNG GESPERRT",
+  "Calculator din lista de blocare": "Computer auf der Sperrliste",
+  "Listă de blocare": "Sperrliste",
+  "Închide imediat conexiunile calculatoarelor din lista de blocare": "Verbindungen von Computern auf der Sperrliste sofort schließen",
+  "Calculator (IP și/sau nume)": "Computer (IP und/oder Name)",
+  "Adaugă": "Hinzufügen",
+  "Șterge selectate": "Auswahl entfernen",
+  "Deschide fișierul": "Datei öffnen",
+  "Șterge din listă (deblochează)": "Aus der Liste entfernen (entsperren)",
+  "IP și/sau nume de calculator, separate prin spațiu (ex.: 192.168.1.50 PC-BIROU). Lista e salvată în blocklist.txt, lângă executabil, și poate fi editată și direct; modificările se aplică în câteva secunde.": "IP-Adresse und/oder Computername, durch Leerzeichen getrennt (z. B. 192.168.1.50 BUERO-PC). Die Liste wird in blocklist.txt neben der Programmdatei gespeichert und kann auch direkt bearbeitet werden; Änderungen gelten innerhalb weniger Sekunden.",
+  "adăugat manual {0}": "manuell hinzugefügt {0}",
+  "blocat din Monitorizare {0}": "aus der Überwachung gesperrt {0}",
+  "„{0}” este chiar acest calculator și nu poate fi blocat.": "„{0}“ ist dieser Computer und kann nicht gesperrt werden.",
+  "„{0}” este deja în lista de blocare.": "„{0}“ steht bereits auf der Sperrliste.",
+  "Nu am putut scrie fișierul blocklist.txt.": "Die Datei blocklist.txt konnte nicht geschrieben werden.",
+  "Blochează calculatorul": "Computer sperren",
+  "Ascunde partajările administrative (C$, ADMIN$ etc.) din liste": "Administrative Freigaben (C$, ADMIN$ usw.) in den Listen ausblenden",
+  "Notificare (fără sunet) când un calculator blocat este deconectat": "Benachrichtigung (ohne Ton), wenn ein gesperrter Computer getrennt wird",
+  "Blochează și în Windows Firewall (porturile SMB 139 și 445): calculatorul nu se mai poate conecta deloc": "Auch in der Windows-Firewall sperren (SMB-Ports 139 und 445): Der Computer kann sich überhaupt nicht mehr verbinden",
+  "Se actualizează...": "Wird aktualisiert...",
+  "Elimină regulile ShareWatch din firewall": "ShareWatch-Regeln aus der Firewall entfernen",
+  "Elimini regula ShareWatch din Windows Firewall și oprești blocarea prin firewall? Lista de blocare rămâne neschimbată.": "Die ShareWatch-Regel aus der Windows-Firewall entfernen und die Sperre über die Firewall beenden? Die Sperrliste bleibt unverändert.",
+  "Eroare: {0}": "Fehler: {0}",
+  "Activă, dar nu există adrese IP de blocat.": "Aktiviert, aber es gibt keine zu sperrenden IP-Adressen.",
+  "Nicio regulă ShareWatch în firewall.": "Keine ShareWatch-Regel in der Firewall.",
+  "Regulă activă: {0} adrese blocate ({1}).": "Regel aktiv: {0} Adressen gesperrt ({1}).",
+  "Blochezi:\r\n{0}\r\n\r\nCalculatorul este deconectat acum și la fiecare încercare de conectare, până îl ștergi din lista de blocare (Opțiuni).": "Sperren:\r\n{0}\r\n\r\nDer Computer wird jetzt und bei jedem Verbindungsversuch getrennt, bis Sie ihn von der Sperrliste entfernen (Optionen).",
+  "PARTAJARE": "FREIGABE ERSTELLT",
+  "ANULARE": "FREIGABE ENTFERNT",
+  "Deconectează calculatorul": "Computer trennen",
+  "Deconectezi:\r\n{0}\r\n\r\nFișierele deschise de pe acest calculator se închid, iar datele nesalvate se pot pierde. Windows se poate reconecta automat la următoarea accesare.": "Trennen:\r\n{0}\r\n\r\nVon diesem Computer geöffnete Dateien werden geschlossen, ungespeicherte Daten können verloren gehen. Windows kann sich beim nächsten Zugriff automatisch wieder verbinden.",
+  "Acces refuzat - rulează aplicația ca Administrator.": "Zugriff verweigert - starten Sie die Anwendung als Administrator.",
+  "Există deja o partajare cu acest nume.": "Eine Freigabe mit diesem Namen existiert bereits.",
+  "Calea nu există sau nu este un folder local.": "Der Pfad existiert nicht oder ist kein lokaler Ordner.",
+  "Partajarea nu există.": "Die Freigabe existiert nicht.",
+  "Calculatorul nu mai este conectat.": "Der Computer ist nicht mehr verbunden.",
+  "Parametru invalid (verifică numele partajării).": "Ungültiger Parameter (Freigabenamen prüfen).",
+  "Eroare Windows: {0}": "Windows-Fehler: {0}",
+  "Partajează un folder...": "Ordner freigeben...",
+  "Partajează un folder": "Ordner freigeben",
+  "Oprește partajarea": "Freigabe aufheben",
+  "Deschide folderul": "Ordner öffnen",
+  "Nu am putut partaja folderul.": "Der Ordner konnte nicht freigegeben werden.",
+  " (citire și scriere)": " (Lesen und Schreiben)",
+  " (doar citire)": " (nur Lesen)",
+  "Selectează o partajare obișnuită (nu administrativă) din listă.": "Wählen Sie eine normale (nicht administrative) Freigabe aus der Liste.",
+  "Oprești partajarea pentru:\r\n{0}\r\n\r\nFolderul și fișierele rămân pe disc; doar nu mai sunt accesibile din rețea. Cine e conectat acum pierde accesul.": "Freigabe aufheben für:\r\n{0}\r\n\r\nDer Ordner und seine Dateien bleiben auf dem Datenträger; sie sind nur nicht mehr über das Netzwerk erreichbar. Wer jetzt verbunden ist, verliert den Zugriff.",
+  "Răsfoiește...": "Durchsuchen...",
+  "Folder:": "Ordner:",
+  "Nume partajare:": "Freigabename:",
+  "Descriere:": "Beschreibung:",
+  "Doar citire": "Nur Lesen",
+  "Citire și scriere": "Lesen und Schreiben",
+  "Acces pentru toți (Everyone):": "Zugriff für alle (Jeder/Everyone):",
+  "Permisiunile NTFS ale folderului se aplică în continuare. Pentru acces din rețea, utilizatorii au nevoie și de drept pe folder (fila Securitate).": "Die NTFS-Berechtigungen des Ordners gelten weiterhin. Für den Netzwerkzugriff benötigen Benutzer auch Rechte auf den Ordner (Registerkarte Sicherheit).",
+  "Partajează": "Freigeben",
+  "Anulează": "Abbrechen",
+  "Alege folderul de partajat": "Ordner zum Freigeben auswählen",
+  "Alege un folder care există.": "Wählen Sie einen vorhandenen Ordner.",
+  "Folderul trebuie să fie pe acest calculator, nu în rețea.": "Der Ordner muss sich auf diesem Computer befinden, nicht im Netzwerk.",
+  "Numele partajării trebuie să aibă între 1 și 80 de caractere.": "Der Freigabename muss 1 bis 80 Zeichen lang sein.",
+  "Numele partajării conține caractere nepermise: \\ / [ ] : | < > + = ; , ? * \"": "Der Freigabename enthält ungültige Zeichen: \\ / [ ] : | < > + = ; , ? * \""
+},
+"en": {
+  "_name": "English",
+  "_info": "ShareWatch 0.7.5 - copy this file as xx.json (xx = language code, e.g. de.json), set _name and translate only the values. Keep the keys (Romanian text) and {0}, {1} unchanged.",
+  "Monitorizare": "Monitoring",
+  "Istoric": "History",
+  "Opțiuni": "Options",
+  "Despre": "About",
+  "Calculator (PC)": "Computer (PC)",
+  "Utilizator": "User",
+  "Partajare": "Share",
+  "Conectat de la": "Connected since",
+  "Fișier / folder deschis": "Open file / folder",
+  "Folder partajat": "Shared folder",
+  "Cale locală": "Local path",
+  "Tip": "Type",
+  "Comentariu": "Comment",
+  "Data / ora": "Date / time",
+  "Eveniment": "Event",
+  "Cale / detalii": "Path / details",
+  "CONECTARE": "CONNECT",
+  "FISIER": "FILE",
+  "DECONECTARE": "DISCONNECT",
+  "ACTIV": "ACTIVE",
+  "EROARE": "ERROR",
+  "necunoscut": "unknown",
+  "ACCES LA FOLDER PARTAJAT": "SHARED FOLDER ACCESS",
+  "Utilizator: ": "User: ",
+  "utilizator": "user",
+  "Deschide fereastra": "Open window",
+  "Foldere partajate": "Shared folders",
+  "Deschide jurnalul": "Open log",
+  "Notificări": "Notifications",
+  "Ignoră accesările de pe acest calculator": "Ignore access from this computer",
+  "Pornește automat cu Windows": "Start with Windows",
+  "Test notificare": "Test notification",
+  "Ieșire": "Exit",
+  " - monitorizare activă": " - monitoring active",
+  "Ultimul acces: ": "Last access: ",
+  "Eroare: acces refuzat - rulează ca Administrator": "Error: access denied - run as Administrator",
+  "Eroare netapi32: {0}": "netapi32 error: {0}",
+  "Acces refuzat. Rulează aplicația ca Administrator pentru a vedea accesările.": "Access denied. Run the application as Administrator to see accesses.",
+  "(nu pot citi lista)": "(cannot read the list)",
+  "(niciun folder partajat)": "(no shared folders)",
+  "Pornește automat la autentificare, direct în tray.": "Starts automatically at sign-in, straight to the tray.",
+  "Pornirea automată a fost dezactivată.": "Automatic start has been disabled.",
+  "Nu am putut modifica pornirea automată (rulează ca Administrator).": "Could not change automatic start (run as Administrator).",
+  " - monitorizare foldere partajate": " - shared folder monitoring",
+  "Acces refuzat - rulează aplicația ca Administrator pentru a vedea conexiunile.": "Access denied - run the application as Administrator to see connections.",
+  "Eroare la citirea conexiunilor (netapi32: {0}).": "Error reading connections (netapi32: {0}).",
+  "Conectați acum ({0})": "Connected now ({0})",
+  "Fișiere deschise acum ({0})": "Files open now ({0})",
+  "Bifează folderele partajate care vor fi monitorizate (notificări și jurnal). Modificările se aplică imediat. Partajările administrative (C$, ADMIN$ etc.) sunt dezactivate implicit.": "Check the shared folders to monitor (notifications and log). Changes apply immediately. Administrative shares (C$, ADMIN$ etc.) are disabled by default.",
+  "Reîmprospătează": "Refresh",
+  "Bifează tot": "Check all",
+  "Debifează tot": "Uncheck all",
+  "Administrativ": "Administrative",
+  "Filtru:": "Filter:",
+  "Eveniment:": "Event:",
+  "Toate": "All",
+  "Deschide în Notepad": "Open in Notepad",
+  "Golește jurnalul": "Clear log",
+  "Ștergi tot conținutul jurnalului? Operația nu poate fi anulată.": "Delete the entire log? This cannot be undone.",
+  "{0} înregistrări": "{0} records",
+  " (afișate ultimele {0})": " (showing the last {0})",
+  "Afișează notificare la accesarea folderelor partajate": "Show a notification when shared folders are accessed",
+  "Sunet discret la notificare": "Subtle sound on notification",
+  "Ignoră accesările făcute de pe acest calculator": "Ignore access made from this computer",
+  "Pornește automat cu Windows (în tray, cu drepturi de administrator, fără UAC)": "Start with Windows (in the tray, with administrator rights, no UAC prompt)",
+  "Durata notificării (secunde):": "Notification duration (seconds):",
+  "Pauză între notificările pentru fișiere, același PC și folder (secunde):": "Pause between file notifications for the same PC and folder (seconds):",
+  "Automat (ca Windows)": "Automatic (like Windows)",
+  "Luminos": "Light",
+  "Întunecat": "Dark",
+  "Temă:": "Theme:",
+  "Limbă:": "Language:",
+  "Deschide fereastra cu un singur clic pe iconița din tray": "Open the window with a single click on the tray icon",
+  "Alte limbi: fișiere language\\xx.json lângă executabil (vezi README).": "Other languages: language\\xx.json files next to the executable (see README).",
+  "Setările se salvează automat în sharewatch.ini, lângă executabil. Închiderea ferestrei (X) lasă aplicația activă în tray; pentru oprire folosește Ieșire din meniul iconiței din tray.": "Settings are saved automatically in sharewatch.ini, next to the executable. Closing the window (X) keeps the application running in the tray; to stop it use Exit from the tray icon menu.",
+  "Nu am putut modifica pornirea automată. Rulează aplicația ca Administrator.": "Could not change automatic start. Run the application as Administrator.",
+  "Versiunea ": "Version ",
+  "Monitorizează accesările la folderele partajate (SMB) ale acestui calculator: afișează notificări cu IP-ul și numele calculatorului care accesează și păstrează un jurnal al accesărilor.": "Monitors access to this computer's shared folders (SMB): shows notifications with the IP and name of the accessing computer and keeps an access log.",
+  "Calculator: ": "Computer: ",
+  "Drepturi de administrator: ": "Administrator rights: ",
+  "da": "yes",
+  "NU (monitorizarea nu va funcționa)": "NO (monitoring will not work)",
+  "Jurnal: ": "Log: ",
+  "Executabil: ": "Executable: ",
+  "Istoric versiuni": "Version history",
+  "DECONECTAT": "KICKED",
+  "BLOCAT": "BLOCKED",
+  "CONEXIUNE BLOCATĂ": "CONNECTION BLOCKED",
+  "Calculator din lista de blocare": "Computer on the block list",
+  "Listă de blocare": "Block list",
+  "Închide imediat conexiunile calculatoarelor din lista de blocare": "Immediately close connections from computers on the block list",
+  "Calculator (IP și/sau nume)": "Computer (IP and/or name)",
+  "Adaugă": "Add",
+  "Șterge selectate": "Remove selected",
+  "Deschide fișierul": "Open file",
+  "Șterge din listă (deblochează)": "Remove from list (unblock)",
+  "IP și/sau nume de calculator, separate prin spațiu (ex.: 192.168.1.50 PC-BIROU). Lista e salvată în blocklist.txt, lângă executabil, și poate fi editată și direct; modificările se aplică în câteva secunde.": "IP and/or computer name, separated by spaces (e.g. 192.168.1.50 OFFICE-PC). The list is saved in blocklist.txt next to the executable and can also be edited directly; changes apply within a few seconds.",
+  "adăugat manual {0}": "added manually {0}",
+  "blocat din Monitorizare {0}": "blocked from Monitoring {0}",
+  "„{0}” este chiar acest calculator și nu poate fi blocat.": "\"{0}\" is this computer and cannot be blocked.",
+  "„{0}” este deja în lista de blocare.": "\"{0}\" is already on the block list.",
+  "Nu am putut scrie fișierul blocklist.txt.": "Could not write the blocklist.txt file.",
+  "Blochează calculatorul": "Block computer",
+  "Ascunde partajările administrative (C$, ADMIN$ etc.) din liste": "Hide administrative shares (C$, ADMIN$ etc.) from the lists",
+  "Notificare (fără sunet) când un calculator blocat este deconectat": "Notification (silent) when a blocked computer is disconnected",
+  "Blochează și în Windows Firewall (porturile SMB 139 și 445): calculatorul nu se mai poate conecta deloc": "Also block in Windows Firewall (SMB ports 139 and 445): the computer cannot connect at all",
+  "Se actualizează...": "Updating...",
+  "Elimină regulile ShareWatch din firewall": "Remove ShareWatch rules from the firewall",
+  "Elimini regula ShareWatch din Windows Firewall și oprești blocarea prin firewall? Lista de blocare rămâne neschimbată.": "Remove the ShareWatch rule from Windows Firewall and stop firewall blocking? The block list stays unchanged.",
+  "Eroare: {0}": "Error: {0}",
+  "Activă, dar nu există adrese IP de blocat.": "Enabled, but there are no IP addresses to block.",
+  "Nicio regulă ShareWatch în firewall.": "No ShareWatch rule in the firewall.",
+  "Regulă activă: {0} adrese blocate ({1}).": "Rule active: {0} addresses blocked ({1}).",
+  "Blochezi:\r\n{0}\r\n\r\nCalculatorul este deconectat acum și la fiecare încercare de conectare, până îl ștergi din lista de blocare (Opțiuni).": "Block:\r\n{0}\r\n\r\nThe computer is disconnected now and on every connection attempt, until you remove it from the block list (Options).",
+  "PARTAJARE": "SHARE ADDED",
+  "ANULARE": "SHARE REMOVED",
+  "Deconectează calculatorul": "Disconnect computer",
+  "Deconectezi:\r\n{0}\r\n\r\nFișierele deschise de pe acest calculator se închid, iar datele nesalvate se pot pierde. Windows se poate reconecta automat la următoarea accesare.": "Disconnect:\r\n{0}\r\n\r\nFiles opened from this computer will be closed and unsaved data may be lost. Windows may reconnect automatically on the next access.",
+  "Acces refuzat - rulează aplicația ca Administrator.": "Access denied - run the application as Administrator.",
+  "Există deja o partajare cu acest nume.": "A share with this name already exists.",
+  "Calea nu există sau nu este un folder local.": "The path does not exist or is not a local folder.",
+  "Partajarea nu există.": "The share does not exist.",
+  "Calculatorul nu mai este conectat.": "The computer is no longer connected.",
+  "Parametru invalid (verifică numele partajării).": "Invalid parameter (check the share name).",
+  "Eroare Windows: {0}": "Windows error: {0}",
+  "Partajează un folder...": "Share a folder...",
+  "Partajează un folder": "Share a folder",
+  "Oprește partajarea": "Stop sharing",
+  "Deschide folderul": "Open folder",
+  "Nu am putut partaja folderul.": "Could not share the folder.",
+  " (citire și scriere)": " (read and write)",
+  " (doar citire)": " (read only)",
+  "Selectează o partajare obișnuită (nu administrativă) din listă.": "Select a regular (not administrative) share from the list.",
+  "Oprești partajarea pentru:\r\n{0}\r\n\r\nFolderul și fișierele rămân pe disc; doar nu mai sunt accesibile din rețea. Cine e conectat acum pierde accesul.": "Stop sharing:\r\n{0}\r\n\r\nThe folder and its files stay on disk; they are just no longer reachable from the network. Anyone connected now loses access.",
+  "Răsfoiește...": "Browse...",
+  "Folder:": "Folder:",
+  "Nume partajare:": "Share name:",
+  "Descriere:": "Description:",
+  "Doar citire": "Read only",
+  "Citire și scriere": "Read and write",
+  "Acces pentru toți (Everyone):": "Access for Everyone:",
+  "Permisiunile NTFS ale folderului se aplică în continuare. Pentru acces din rețea, utilizatorii au nevoie și de drept pe folder (fila Securitate).": "The folder's NTFS permissions still apply. For network access, users also need rights on the folder (Security tab).",
+  "Partajează": "Share",
+  "Anulează": "Cancel",
+  "Alege folderul de partajat": "Choose the folder to share",
+  "Alege un folder care există.": "Choose a folder that exists.",
+  "Folderul trebuie să fie pe acest calculator, nu în rețea.": "The folder must be on this computer, not on the network.",
+  "Numele partajării trebuie să aibă între 1 și 80 de caractere.": "The share name must be 1 to 80 characters long.",
+  "Numele partajării conține caractere nepermise: \\ / [ ] : | < > + = ; , ? * \"": "The share name contains invalid characters: \\ / [ ] : | < > + = ; , ? * \""
+},
+"es": {
+  "_name": "Español",
+  "_info": "ShareWatch 0.7.0 - Español translation. Keys are the Romanian texts; translate only the values.",
+  "Monitorizare": "Supervisión",
+  "Istoric": "Historial",
+  "Opțiuni": "Opciones",
+  "Despre": "Acerca de",
+  "Calculator (PC)": "Equipo (PC)",
+  "Utilizator": "Usuario",
+  "Partajare": "Recurso compartido",
+  "Conectat de la": "Conectado desde",
+  "Fișier / folder deschis": "Archivo / carpeta abiertos",
+  "Folder partajat": "Carpeta compartida",
+  "Cale locală": "Ruta local",
+  "Tip": "Tipo",
+  "Comentariu": "Comentario",
+  "Data / ora": "Fecha / hora",
+  "Eveniment": "Evento",
+  "Cale / detalii": "Ruta / detalles",
+  "CONECTARE": "CONEXIÓN",
+  "FISIER": "ARCHIVO",
+  "DECONECTARE": "DESCONEXIÓN",
+  "ACTIV": "ACTIVO",
+  "EROARE": "ERROR",
+  "necunoscut": "desconocido",
+  "ACCES LA FOLDER PARTAJAT": "ACCESO A CARPETA COMPARTIDA",
+  "Utilizator: ": "Usuario: ",
+  "utilizator": "usuario",
+  "Deschide fereastra": "Abrir ventana",
+  "Foldere partajate": "Carpetas compartidas",
+  "Deschide jurnalul": "Abrir registro",
+  "Notificări": "Notificaciones",
+  "Ignoră accesările de pe acest calculator": "Ignorar accesos desde este equipo",
+  "Pornește automat cu Windows": "Iniciar con Windows",
+  "Test notificare": "Probar notificación",
+  "Ieșire": "Salir",
+  " - monitorizare activă": " - supervisión activa",
+  "Ultimul acces: ": "Último acceso: ",
+  "Eroare: acces refuzat - rulează ca Administrator": "Error: acceso denegado - ejecute como administrador",
+  "Eroare netapi32: {0}": "Error de netapi32: {0}",
+  "Acces refuzat. Rulează aplicația ca Administrator pentru a vedea accesările.": "Acceso denegado. Ejecute la aplicación como administrador para ver los accesos.",
+  "(nu pot citi lista)": "(no se puede leer la lista)",
+  "(niciun folder partajat)": "(ninguna carpeta compartida)",
+  "Pornește automat la autentificare, direct în tray.": "Se inicia automáticamente al iniciar sesión, directamente en la bandeja del sistema.",
+  "Pornirea automată a fost dezactivată.": "El inicio automático se ha desactivado.",
+  "Nu am putut modifica pornirea automată (rulează ca Administrator).": "No se pudo cambiar el inicio automático (ejecute como administrador).",
+  " - monitorizare foldere partajate": " - supervisión de carpetas compartidas",
+  "Acces refuzat - rulează aplicația ca Administrator pentru a vedea conexiunile.": "Acceso denegado - ejecute la aplicación como administrador para ver las conexiones.",
+  "Eroare la citirea conexiunilor (netapi32: {0}).": "Error al leer las conexiones (netapi32: {0}).",
+  "Conectați acum ({0})": "Conectados ahora ({0})",
+  "Fișiere deschise acum ({0})": "Archivos abiertos ahora ({0})",
+  "Bifează folderele partajate care vor fi monitorizate (notificări și jurnal). Modificările se aplică imediat. Partajările administrative (C$, ADMIN$ etc.) sunt dezactivate implicit.": "Marque las carpetas compartidas que se supervisarán (notificaciones y registro). Los cambios se aplican de inmediato. Los recursos compartidos administrativos (C$, ADMIN$, etc.) están desactivados de forma predeterminada.",
+  "Reîmprospătează": "Actualizar",
+  "Bifează tot": "Marcar todo",
+  "Debifează tot": "Desmarcar todo",
+  "Administrativ": "Administrativo",
+  "Filtru:": "Filtro:",
+  "Eveniment:": "Evento:",
+  "Toate": "Todos",
+  "Deschide în Notepad": "Abrir en el Bloc de notas",
+  "Golește jurnalul": "Vaciar registro",
+  "Ștergi tot conținutul jurnalului? Operația nu poate fi anulată.": "¿Borrar todo el contenido del registro? Esta operación no se puede deshacer.",
+  "{0} înregistrări": "{0} entradas",
+  " (afișate ultimele {0})": " (se muestran las últimas {0})",
+  "Afișează notificare la accesarea folderelor partajate": "Mostrar una notificación al acceder a las carpetas compartidas",
+  "Sunet discret la notificare": "Sonido discreto en la notificación",
+  "Ignoră accesările făcute de pe acest calculator": "Ignorar los accesos realizados desde este equipo",
+  "Pornește automat cu Windows (în tray, cu drepturi de administrator, fără UAC)": "Iniciar con Windows (en la bandeja del sistema, con derechos de administrador, sin aviso de UAC)",
+  "Durata notificării (secunde):": "Duración de la notificación (segundos):",
+  "Pauză între notificările pentru fișiere, același PC și folder (secunde):": "Pausa entre notificaciones de archivos para el mismo PC y carpeta (segundos):",
+  "Automat (ca Windows)": "Automático (como Windows)",
+  "Luminos": "Claro",
+  "Întunecat": "Oscuro",
+  "Temă:": "Tema:",
+  "Limbă:": "Idioma:",
+  "Deschide fereastra cu un singur clic pe iconița din tray": "Abrir la ventana con un solo clic en el icono de la bandeja del sistema",
+  "Alte limbi: fișiere language\\xx.json lângă executabil (vezi README).": "Otros idiomas: archivos language\\xx.json junto al ejecutable (ver README).",
+  "Setările se salvează automat în sharewatch.ini, lângă executabil. Închiderea ferestrei (X) lasă aplicația activă în tray; pentru oprire folosește Ieșire din meniul iconiței din tray.": "La configuración se guarda automáticamente en sharewatch.ini, junto al ejecutable. Cerrar la ventana (X) deja la aplicación activa en la bandeja del sistema; para detenerla, use Salir en el menú del icono.",
+  "Nu am putut modifica pornirea automată. Rulează aplicația ca Administrator.": "No se pudo cambiar el inicio automático. Ejecute la aplicación como administrador.",
+  "Versiunea ": "Versión ",
+  "Monitorizează accesările la folderele partajate (SMB) ale acestui calculator: afișează notificări cu IP-ul și numele calculatorului care accesează și păstrează un jurnal al accesărilor.": "Supervisa los accesos a las carpetas compartidas (SMB) de este equipo: muestra notificaciones con la IP y el nombre del equipo que accede y guarda un registro de los accesos.",
+  "Calculator: ": "Equipo: ",
+  "Drepturi de administrator: ": "Derechos de administrador: ",
+  "da": "sí",
+  "NU (monitorizarea nu va funcționa)": "NO (la supervisión no funcionará)",
+  "Jurnal: ": "Registro: ",
+  "Executabil: ": "Ejecutable: ",
+  "Istoric versiuni": "Historial de versiones",
+  "DECONECTAT": "EXPULSADO",
+  "BLOCAT": "BLOQUEADO",
+  "CONEXIUNE BLOCATĂ": "CONEXIÓN BLOQUEADA",
+  "Calculator din lista de blocare": "Equipo de la lista de bloqueo",
+  "Listă de blocare": "Lista de bloqueo",
+  "Închide imediat conexiunile calculatoarelor din lista de blocare": "Cerrar de inmediato las conexiones de los equipos de la lista de bloqueo",
+  "Calculator (IP și/sau nume)": "Equipo (IP y/o nombre)",
+  "Adaugă": "Añadir",
+  "Șterge selectate": "Quitar seleccionados",
+  "Deschide fișierul": "Abrir archivo",
+  "Șterge din listă (deblochează)": "Quitar de la lista (desbloquear)",
+  "IP și/sau nume de calculator, separate prin spațiu (ex.: 192.168.1.50 PC-BIROU). Lista e salvată în blocklist.txt, lângă executabil, și poate fi editată și direct; modificările se aplică în câteva secunde.": "IP y/o nombre de equipo, separados por espacios (ej.: 192.168.1.50 PC-OFICINA). La lista se guarda en blocklist.txt, junto al ejecutable, y también se puede editar directamente; los cambios se aplican en pocos segundos.",
+  "adăugat manual {0}": "añadido manualmente {0}",
+  "blocat din Monitorizare {0}": "bloqueado desde Supervisión {0}",
+  "„{0}” este chiar acest calculator și nu poate fi blocat.": "«{0}» es este mismo equipo y no se puede bloquear.",
+  "„{0}” este deja în lista de blocare.": "«{0}» ya está en la lista de bloqueo.",
+  "Nu am putut scrie fișierul blocklist.txt.": "No se pudo escribir el archivo blocklist.txt.",
+  "Blochează calculatorul": "Bloquear equipo",
+  "Ascunde partajările administrative (C$, ADMIN$ etc.) din liste": "Ocultar los recursos compartidos administrativos (C$, ADMIN$, etc.) de las listas",
+  "Notificare (fără sunet) când un calculator blocat este deconectat": "Notificación (sin sonido) cuando se desconecta un equipo bloqueado",
+  "Blochează și în Windows Firewall (porturile SMB 139 și 445): calculatorul nu se mai poate conecta deloc": "Bloquear también en el Firewall de Windows (puertos SMB 139 y 445): el equipo ya no podrá conectarse",
+  "Se actualizează...": "Actualizando...",
+  "Elimină regulile ShareWatch din firewall": "Quitar las reglas de ShareWatch del firewall",
+  "Elimini regula ShareWatch din Windows Firewall și oprești blocarea prin firewall? Lista de blocare rămâne neschimbată.": "¿Quitar la regla de ShareWatch del Firewall de Windows y detener el bloqueo por firewall? La lista de bloqueo no cambia.",
+  "Eroare: {0}": "Error: {0}",
+  "Activă, dar nu există adrese IP de blocat.": "Activado, pero no hay direcciones IP que bloquear.",
+  "Nicio regulă ShareWatch în firewall.": "No hay ninguna regla de ShareWatch en el firewall.",
+  "Regulă activă: {0} adrese blocate ({1}).": "Regla activa: {0} direcciones bloqueadas ({1}).",
+  "Blochezi:\r\n{0}\r\n\r\nCalculatorul este deconectat acum și la fiecare încercare de conectare, până îl ștergi din lista de blocare (Opțiuni).": "Bloquear:\r\n{0}\r\n\r\nEl equipo se desconecta ahora y en cada intento de conexión, hasta que lo quite de la lista de bloqueo (Opciones).",
+  "PARTAJARE": "RECURSO AÑADIDO",
+  "ANULARE": "RECURSO QUITADO",
+  "Deconectează calculatorul": "Desconectar equipo",
+  "Deconectezi:\r\n{0}\r\n\r\nFișierele deschise de pe acest calculator se închid, iar datele nesalvate se pot pierde. Windows se poate reconecta automat la următoarea accesare.": "Desconectar:\r\n{0}\r\n\r\nLos archivos abiertos desde este equipo se cerrarán y los datos no guardados pueden perderse. Windows puede volver a conectarse automáticamente en el siguiente acceso.",
+  "Acces refuzat - rulează aplicația ca Administrator.": "Acceso denegado - ejecute la aplicación como administrador.",
+  "Există deja o partajare cu acest nume.": "Ya existe un recurso compartido con este nombre.",
+  "Calea nu există sau nu este un folder local.": "La ruta no existe o no es una carpeta local.",
+  "Partajarea nu există.": "El recurso compartido no existe.",
+  "Calculatorul nu mai este conectat.": "El equipo ya no está conectado.",
+  "Parametru invalid (verifică numele partajării).": "Parámetro no válido (compruebe el nombre del recurso compartido).",
+  "Eroare Windows: {0}": "Error de Windows: {0}",
+  "Partajează un folder...": "Compartir una carpeta...",
+  "Partajează un folder": "Compartir una carpeta",
+  "Oprește partajarea": "Dejar de compartir",
+  "Deschide folderul": "Abrir carpeta",
+  "Nu am putut partaja folderul.": "No se pudo compartir la carpeta.",
+  " (citire și scriere)": " (lectura y escritura)",
+  " (doar citire)": " (solo lectura)",
+  "Selectează o partajare obișnuită (nu administrativă) din listă.": "Seleccione de la lista un recurso compartido normal (no administrativo).",
+  "Oprești partajarea pentru:\r\n{0}\r\n\r\nFolderul și fișierele rămân pe disc; doar nu mai sunt accesibile din rețea. Cine e conectat acum pierde accesul.": "Dejar de compartir:\r\n{0}\r\n\r\nLa carpeta y sus archivos permanecen en el disco; simplemente ya no son accesibles desde la red. Quien esté conectado ahora pierde el acceso.",
+  "Răsfoiește...": "Examinar...",
+  "Folder:": "Carpeta:",
+  "Nume partajare:": "Nombre del recurso:",
+  "Descriere:": "Descripción:",
+  "Doar citire": "Solo lectura",
+  "Citire și scriere": "Lectura y escritura",
+  "Acces pentru toți (Everyone):": "Acceso para todos (Everyone):",
+  "Permisiunile NTFS ale folderului se aplică în continuare. Pentru acces din rețea, utilizatorii au nevoie și de drept pe folder (fila Securitate).": "Los permisos NTFS de la carpeta se siguen aplicando. Para el acceso por red, los usuarios también necesitan permisos sobre la carpeta (pestaña Seguridad).",
+  "Partajează": "Compartir",
+  "Anulează": "Cancelar",
+  "Alege folderul de partajat": "Elija la carpeta que desea compartir",
+  "Alege un folder care există.": "Elija una carpeta que exista.",
+  "Folderul trebuie să fie pe acest calculator, nu în rețea.": "La carpeta debe estar en este equipo, no en la red.",
+  "Numele partajării trebuie să aibă între 1 și 80 de caractere.": "El nombre del recurso compartido debe tener entre 1 y 80 caracteres.",
+  "Numele partajării conține caractere nepermise: \\ / [ ] : | < > + = ; , ? * \"": "El nombre del recurso compartido contiene caracteres no permitidos: \\ / [ ] : | < > + = ; , ? * \""
+},
+"fr": {
+  "_name": "Français",
+  "_info": "ShareWatch 0.7.0 - Français translation. Keys are the Romanian texts; translate only the values.",
+  "Monitorizare": "Surveillance",
+  "Istoric": "Historique",
+  "Opțiuni": "Options",
+  "Despre": "À propos",
+  "Calculator (PC)": "Ordinateur (PC)",
+  "Utilizator": "Utilisateur",
+  "Partajare": "Partage",
+  "Conectat de la": "Connecté depuis",
+  "Fișier / folder deschis": "Fichier / dossier ouvert",
+  "Folder partajat": "Dossier partagé",
+  "Cale locală": "Chemin local",
+  "Tip": "Type",
+  "Comentariu": "Commentaire",
+  "Data / ora": "Date / heure",
+  "Eveniment": "Événement",
+  "Cale / detalii": "Chemin / détails",
+  "CONECTARE": "CONNEXION",
+  "FISIER": "FICHIER",
+  "DECONECTARE": "DÉCONNEXION",
+  "ACTIV": "ACTIF",
+  "EROARE": "ERREUR",
+  "necunoscut": "inconnu",
+  "ACCES LA FOLDER PARTAJAT": "ACCÈS À UN DOSSIER PARTAGÉ",
+  "Utilizator: ": "Utilisateur : ",
+  "utilizator": "utilisateur",
+  "Deschide fereastra": "Ouvrir la fenêtre",
+  "Foldere partajate": "Dossiers partagés",
+  "Deschide jurnalul": "Ouvrir le journal",
+  "Notificări": "Notifications",
+  "Ignoră accesările de pe acest calculator": "Ignorer les accès depuis cet ordinateur",
+  "Pornește automat cu Windows": "Démarrer avec Windows",
+  "Test notificare": "Tester la notification",
+  "Ieșire": "Quitter",
+  " - monitorizare activă": " - surveillance active",
+  "Ultimul acces: ": "Dernier accès : ",
+  "Eroare: acces refuzat - rulează ca Administrator": "Erreur : accès refusé - exécutez en tant qu'administrateur",
+  "Eroare netapi32: {0}": "Erreur netapi32 : {0}",
+  "Acces refuzat. Rulează aplicația ca Administrator pentru a vedea accesările.": "Accès refusé. Exécutez l'application en tant qu'administrateur pour voir les accès.",
+  "(nu pot citi lista)": "(impossible de lire la liste)",
+  "(niciun folder partajat)": "(aucun dossier partagé)",
+  "Pornește automat la autentificare, direct în tray.": "Démarre automatiquement à l'ouverture de session, directement dans la zone de notification.",
+  "Pornirea automată a fost dezactivată.": "Le démarrage automatique a été désactivé.",
+  "Nu am putut modifica pornirea automată (rulează ca Administrator).": "Impossible de modifier le démarrage automatique (exécutez en tant qu'administrateur).",
+  " - monitorizare foldere partajate": " - surveillance des dossiers partagés",
+  "Acces refuzat - rulează aplicația ca Administrator pentru a vedea conexiunile.": "Accès refusé - exécutez l'application en tant qu'administrateur pour voir les connexions.",
+  "Eroare la citirea conexiunilor (netapi32: {0}).": "Erreur de lecture des connexions (netapi32 : {0}).",
+  "Conectați acum ({0})": "Connectés maintenant ({0})",
+  "Fișiere deschise acum ({0})": "Fichiers ouverts maintenant ({0})",
+  "Bifează folderele partajate care vor fi monitorizate (notificări și jurnal). Modificările se aplică imediat. Partajările administrative (C$, ADMIN$ etc.) sunt dezactivate implicit.": "Cochez les dossiers partagés à surveiller (notifications et journal). Les modifications s'appliquent immédiatement. Les partages administratifs (C$, ADMIN$ etc.) sont désactivés par défaut.",
+  "Reîmprospătează": "Actualiser",
+  "Bifează tot": "Tout cocher",
+  "Debifează tot": "Tout décocher",
+  "Administrativ": "Administratif",
+  "Filtru:": "Filtre :",
+  "Eveniment:": "Événement :",
+  "Toate": "Tous",
+  "Deschide în Notepad": "Ouvrir dans le Bloc-notes",
+  "Golește jurnalul": "Vider le journal",
+  "Ștergi tot conținutul jurnalului? Operația nu poate fi anulată.": "Supprimer tout le contenu du journal ? Cette opération est irréversible.",
+  "{0} înregistrări": "{0} entrées",
+  " (afișate ultimele {0})": " (affichage des {0} dernières)",
+  "Afișează notificare la accesarea folderelor partajate": "Afficher une notification lors de l'accès aux dossiers partagés",
+  "Sunet discret la notificare": "Son discret lors des notifications",
+  "Ignoră accesările făcute de pe acest calculator": "Ignorer les accès effectués depuis cet ordinateur",
+  "Pornește automat cu Windows (în tray, cu drepturi de administrator, fără UAC)": "Démarrer avec Windows (dans la zone de notification, avec les droits d'administrateur, sans invite UAC)",
+  "Durata notificării (secunde):": "Durée de la notification (secondes) :",
+  "Pauză între notificările pentru fișiere, același PC și folder (secunde):": "Pause entre les notifications de fichiers pour le même PC et dossier (secondes) :",
+  "Automat (ca Windows)": "Automatique (comme Windows)",
+  "Luminos": "Clair",
+  "Întunecat": "Sombre",
+  "Temă:": "Thème :",
+  "Limbă:": "Langue :",
+  "Deschide fereastra cu un singur clic pe iconița din tray": "Ouvrir la fenêtre d'un simple clic sur l'icône de la zone de notification",
+  "Alte limbi: fișiere language\\xx.json lângă executabil (vezi README).": "Autres langues : fichiers language\\xx.json à côté de l'exécutable (voir README).",
+  "Setările se salvează automat în sharewatch.ini, lângă executabil. Închiderea ferestrei (X) lasă aplicația activă în tray; pentru oprire folosește Ieșire din meniul iconiței din tray.": "Les paramètres sont enregistrés automatiquement dans sharewatch.ini, à côté de l'exécutable. Fermer la fenêtre (X) laisse l'application active dans la zone de notification ; pour l'arrêter, utilisez Quitter dans le menu de l'icône.",
+  "Nu am putut modifica pornirea automată. Rulează aplicația ca Administrator.": "Impossible de modifier le démarrage automatique. Exécutez l'application en tant qu'administrateur.",
+  "Versiunea ": "Version ",
+  "Monitorizează accesările la folderele partajate (SMB) ale acestui calculator: afișează notificări cu IP-ul și numele calculatorului care accesează și păstrează un jurnal al accesărilor.": "Surveille les accès aux dossiers partagés (SMB) de cet ordinateur : affiche des notifications avec l'adresse IP et le nom de l'ordinateur qui accède et tient un journal des accès.",
+  "Calculator: ": "Ordinateur : ",
+  "Drepturi de administrator: ": "Droits d'administrateur : ",
+  "da": "oui",
+  "NU (monitorizarea nu va funcționa)": "NON (la surveillance ne fonctionnera pas)",
+  "Jurnal: ": "Journal : ",
+  "Executabil: ": "Exécutable : ",
+  "Istoric versiuni": "Historique des versions",
+  "DECONECTAT": "EXPULSÉ",
+  "BLOCAT": "BLOQUÉ",
+  "CONEXIUNE BLOCATĂ": "CONNEXION BLOQUÉE",
+  "Calculator din lista de blocare": "Ordinateur de la liste de blocage",
+  "Listă de blocare": "Liste de blocage",
+  "Închide imediat conexiunile calculatoarelor din lista de blocare": "Fermer immédiatement les connexions des ordinateurs de la liste de blocage",
+  "Calculator (IP și/sau nume)": "Ordinateur (IP et/ou nom)",
+  "Adaugă": "Ajouter",
+  "Șterge selectate": "Supprimer la sélection",
+  "Deschide fișierul": "Ouvrir le fichier",
+  "Șterge din listă (deblochează)": "Retirer de la liste (débloquer)",
+  "IP și/sau nume de calculator, separate prin spațiu (ex.: 192.168.1.50 PC-BIROU). Lista e salvată în blocklist.txt, lângă executabil, și poate fi editată și direct; modificările se aplică în câteva secunde.": "Adresse IP et/ou nom d'ordinateur, séparés par des espaces (ex. : 192.168.1.50 PC-BUREAU). La liste est enregistrée dans blocklist.txt, à côté de l'exécutable, et peut aussi être modifiée directement ; les modifications s'appliquent en quelques secondes.",
+  "adăugat manual {0}": "ajouté manuellement {0}",
+  "blocat din Monitorizare {0}": "bloqué depuis Surveillance {0}",
+  "„{0}” este chiar acest calculator și nu poate fi blocat.": "« {0} » est cet ordinateur et ne peut pas être bloqué.",
+  "„{0}” este deja în lista de blocare.": "« {0} » figure déjà dans la liste de blocage.",
+  "Nu am putut scrie fișierul blocklist.txt.": "Impossible d'écrire le fichier blocklist.txt.",
+  "Blochează calculatorul": "Bloquer l'ordinateur",
+  "Ascunde partajările administrative (C$, ADMIN$ etc.) din liste": "Masquer les partages administratifs (C$, ADMIN$ etc.) dans les listes",
+  "Notificare (fără sunet) când un calculator blocat este deconectat": "Notification (sans son) lorsqu'un ordinateur bloqué est déconnecté",
+  "Blochează și în Windows Firewall (porturile SMB 139 și 445): calculatorul nu se mai poate conecta deloc": "Bloquer aussi dans le Pare-feu Windows (ports SMB 139 et 445) : l'ordinateur ne peut plus du tout se connecter",
+  "Se actualizează...": "Mise à jour...",
+  "Elimină regulile ShareWatch din firewall": "Supprimer les règles ShareWatch du pare-feu",
+  "Elimini regula ShareWatch din Windows Firewall și oprești blocarea prin firewall? Lista de blocare rămâne neschimbată.": "Supprimer la règle ShareWatch du Pare-feu Windows et arrêter le blocage par pare-feu ? La liste de blocage reste inchangée.",
+  "Eroare: {0}": "Erreur : {0}",
+  "Activă, dar nu există adrese IP de blocat.": "Activé, mais aucune adresse IP à bloquer.",
+  "Nicio regulă ShareWatch în firewall.": "Aucune règle ShareWatch dans le pare-feu.",
+  "Regulă activă: {0} adrese blocate ({1}).": "Règle active : {0} adresses bloquées ({1}).",
+  "Blochezi:\r\n{0}\r\n\r\nCalculatorul este deconectat acum și la fiecare încercare de conectare, până îl ștergi din lista de blocare (Opțiuni).": "Bloquer :\r\n{0}\r\n\r\nL'ordinateur est déconnecté maintenant et à chaque tentative de connexion, jusqu'à ce que vous le retiriez de la liste de blocage (Options).",
+  "PARTAJARE": "PARTAGE AJOUTÉ",
+  "ANULARE": "PARTAGE SUPPRIMÉ",
+  "Deconectează calculatorul": "Déconnecter l'ordinateur",
+  "Deconectezi:\r\n{0}\r\n\r\nFișierele deschise de pe acest calculator se închid, iar datele nesalvate se pot pierde. Windows se poate reconecta automat la următoarea accesare.": "Déconnecter :\r\n{0}\r\n\r\nLes fichiers ouverts depuis cet ordinateur seront fermés et les données non enregistrées peuvent être perdues. Windows peut se reconnecter automatiquement au prochain accès.",
+  "Acces refuzat - rulează aplicația ca Administrator.": "Accès refusé - exécutez l'application en tant qu'administrateur.",
+  "Există deja o partajare cu acest nume.": "Un partage portant ce nom existe déjà.",
+  "Calea nu există sau nu este un folder local.": "Le chemin n'existe pas ou n'est pas un dossier local.",
+  "Partajarea nu există.": "Le partage n'existe pas.",
+  "Calculatorul nu mai este conectat.": "L'ordinateur n'est plus connecté.",
+  "Parametru invalid (verifică numele partajării).": "Paramètre non valide (vérifiez le nom du partage).",
+  "Eroare Windows: {0}": "Erreur Windows : {0}",
+  "Partajează un folder...": "Partager un dossier...",
+  "Partajează un folder": "Partager un dossier",
+  "Oprește partajarea": "Arrêter le partage",
+  "Deschide folderul": "Ouvrir le dossier",
+  "Nu am putut partaja folderul.": "Impossible de partager le dossier.",
+  " (citire și scriere)": " (lecture et écriture)",
+  " (doar citire)": " (lecture seule)",
+  "Selectează o partajare obișnuită (nu administrativă) din listă.": "Sélectionnez un partage ordinaire (non administratif) dans la liste.",
+  "Oprești partajarea pentru:\r\n{0}\r\n\r\nFolderul și fișierele rămân pe disc; doar nu mai sunt accesibile din rețea. Cine e conectat acum pierde accesul.": "Arrêter le partage de :\r\n{0}\r\n\r\nLe dossier et ses fichiers restent sur le disque ; ils ne sont simplement plus accessibles depuis le réseau. Les personnes connectées perdent l'accès.",
+  "Răsfoiește...": "Parcourir...",
+  "Folder:": "Dossier :",
+  "Nume partajare:": "Nom du partage :",
+  "Descriere:": "Description :",
+  "Doar citire": "Lecture seule",
+  "Citire și scriere": "Lecture et écriture",
+  "Acces pentru toți (Everyone):": "Accès pour tout le monde (Everyone) :",
+  "Permisiunile NTFS ale folderului se aplică în continuare. Pentru acces din rețea, utilizatorii au nevoie și de drept pe folder (fila Securitate).": "Les autorisations NTFS du dossier s'appliquent toujours. Pour l'accès réseau, les utilisateurs ont aussi besoin de droits sur le dossier (onglet Sécurité).",
+  "Partajează": "Partager",
+  "Anulează": "Annuler",
+  "Alege folderul de partajat": "Choisissez le dossier à partager",
+  "Alege un folder care există.": "Choisissez un dossier existant.",
+  "Folderul trebuie să fie pe acest calculator, nu în rețea.": "Le dossier doit se trouver sur cet ordinateur, pas sur le réseau.",
+  "Numele partajării trebuie să aibă între 1 și 80 de caractere.": "Le nom du partage doit comporter entre 1 et 80 caractères.",
+  "Numele partajării conține caractere nepermise: \\ / [ ] : | < > + = ; , ? * \"": "Le nom du partage contient des caractères non autorisés : \\ / [ ] : | < > + = ; , ? * \""
+},
+"it": {
+  "_name": "Italiano",
+  "_info": "ShareWatch 0.7.0 - Italiano translation. Keys are the Romanian texts; translate only the values.",
+  "Monitorizare": "Monitoraggio",
+  "Istoric": "Cronologia",
+  "Opțiuni": "Opzioni",
+  "Despre": "Informazioni",
+  "Calculator (PC)": "Computer (PC)",
+  "Utilizator": "Utente",
+  "Partajare": "Condivisione",
+  "Conectat de la": "Connesso dalle",
+  "Fișier / folder deschis": "File / cartella aperti",
+  "Folder partajat": "Cartella condivisa",
+  "Cale locală": "Percorso locale",
+  "Tip": "Tipo",
+  "Comentariu": "Commento",
+  "Data / ora": "Data / ora",
+  "Eveniment": "Evento",
+  "Cale / detalii": "Percorso / dettagli",
+  "CONECTARE": "CONNESSIONE",
+  "FISIER": "FILE",
+  "DECONECTARE": "DISCONNESSIONE",
+  "ACTIV": "ATTIVO",
+  "EROARE": "ERRORE",
+  "necunoscut": "sconosciuto",
+  "ACCES LA FOLDER PARTAJAT": "ACCESSO A CARTELLA CONDIVISA",
+  "Utilizator: ": "Utente: ",
+  "utilizator": "utente",
+  "Deschide fereastra": "Apri finestra",
+  "Foldere partajate": "Cartelle condivise",
+  "Deschide jurnalul": "Apri registro",
+  "Notificări": "Notifiche",
+  "Ignoră accesările de pe acest calculator": "Ignora gli accessi da questo computer",
+  "Pornește automat cu Windows": "Avvia con Windows",
+  "Test notificare": "Prova notifica",
+  "Ieșire": "Esci",
+  " - monitorizare activă": " - monitoraggio attivo",
+  "Ultimul acces: ": "Ultimo accesso: ",
+  "Eroare: acces refuzat - rulează ca Administrator": "Errore: accesso negato - esegui come amministratore",
+  "Eroare netapi32: {0}": "Errore netapi32: {0}",
+  "Acces refuzat. Rulează aplicația ca Administrator pentru a vedea accesările.": "Accesso negato. Esegui l'applicazione come amministratore per vedere gli accessi.",
+  "(nu pot citi lista)": "(impossibile leggere l'elenco)",
+  "(niciun folder partajat)": "(nessuna cartella condivisa)",
+  "Pornește automat la autentificare, direct în tray.": "Si avvia automaticamente all'accesso, direttamente nell'area di notifica.",
+  "Pornirea automată a fost dezactivată.": "L'avvio automatico è stato disattivato.",
+  "Nu am putut modifica pornirea automată (rulează ca Administrator).": "Impossibile modificare l'avvio automatico (esegui come amministratore).",
+  " - monitorizare foldere partajate": " - monitoraggio cartelle condivise",
+  "Acces refuzat - rulează aplicația ca Administrator pentru a vedea conexiunile.": "Accesso negato - esegui l'applicazione come amministratore per vedere le connessioni.",
+  "Eroare la citirea conexiunilor (netapi32: {0}).": "Errore durante la lettura delle connessioni (netapi32: {0}).",
+  "Conectați acum ({0})": "Connessi ora ({0})",
+  "Fișiere deschise acum ({0})": "File aperti ora ({0})",
+  "Bifează folderele partajate care vor fi monitorizate (notificări și jurnal). Modificările se aplică imediat. Partajările administrative (C$, ADMIN$ etc.) sunt dezactivate implicit.": "Seleziona le cartelle condivise da monitorare (notifiche e registro). Le modifiche si applicano subito. Le condivisioni amministrative (C$, ADMIN$ ecc.) sono disattivate per impostazione predefinita.",
+  "Reîmprospătează": "Aggiorna",
+  "Bifează tot": "Seleziona tutto",
+  "Debifează tot": "Deseleziona tutto",
+  "Administrativ": "Amministrativa",
+  "Filtru:": "Filtro:",
+  "Eveniment:": "Evento:",
+  "Toate": "Tutti",
+  "Deschide în Notepad": "Apri nel Blocco note",
+  "Golește jurnalul": "Svuota registro",
+  "Ștergi tot conținutul jurnalului? Operația nu poate fi anulată.": "Eliminare tutto il contenuto del registro? L'operazione non può essere annullata.",
+  "{0} înregistrări": "{0} voci",
+  " (afișate ultimele {0})": " (visualizzate le ultime {0})",
+  "Afișează notificare la accesarea folderelor partajate": "Mostra una notifica quando si accede alle cartelle condivise",
+  "Sunet discret la notificare": "Suono discreto alla notifica",
+  "Ignoră accesările făcute de pe acest calculator": "Ignora gli accessi effettuati da questo computer",
+  "Pornește automat cu Windows (în tray, cu drepturi de administrator, fără UAC)": "Avvia con Windows (nell'area di notifica, con diritti di amministratore, senza richiesta UAC)",
+  "Durata notificării (secunde):": "Durata della notifica (secondi):",
+  "Pauză între notificările pentru fișiere, același PC și folder (secunde):": "Pausa tra le notifiche dei file per lo stesso PC e la stessa cartella (secondi):",
+  "Automat (ca Windows)": "Automatico (come Windows)",
+  "Luminos": "Chiaro",
+  "Întunecat": "Scuro",
+  "Temă:": "Tema:",
+  "Limbă:": "Lingua:",
+  "Deschide fereastra cu un singur clic pe iconița din tray": "Apri la finestra con un solo clic sull'icona nell'area di notifica",
+  "Alte limbi: fișiere language\\xx.json lângă executabil (vezi README).": "Altre lingue: file language\\xx.json accanto all'eseguibile (vedi README).",
+  "Setările se salvează automat în sharewatch.ini, lângă executabil. Închiderea ferestrei (X) lasă aplicația activă în tray; pentru oprire folosește Ieșire din meniul iconiței din tray.": "Le impostazioni vengono salvate automaticamente in sharewatch.ini, accanto all'eseguibile. La chiusura della finestra (X) lascia l'applicazione attiva nell'area di notifica; per chiuderla usa Esci dal menu dell'icona.",
+  "Nu am putut modifica pornirea automată. Rulează aplicația ca Administrator.": "Impossibile modificare l'avvio automatico. Esegui l'applicazione come amministratore.",
+  "Versiunea ": "Versione ",
+  "Monitorizează accesările la folderele partajate (SMB) ale acestui calculator: afișează notificări cu IP-ul și numele calculatorului care accesează și păstrează un jurnal al accesărilor.": "Monitora gli accessi alle cartelle condivise (SMB) di questo computer: mostra notifiche con l'IP e il nome del computer che accede e tiene un registro degli accessi.",
+  "Calculator: ": "Computer: ",
+  "Drepturi de administrator: ": "Diritti di amministratore: ",
+  "da": "sì",
+  "NU (monitorizarea nu va funcționa)": "NO (il monitoraggio non funzionerà)",
+  "Jurnal: ": "Registro: ",
+  "Executabil: ": "Eseguibile: ",
+  "Istoric versiuni": "Cronologia versioni",
+  "DECONECTAT": "ESPULSO",
+  "BLOCAT": "BLOCCATO",
+  "CONEXIUNE BLOCATĂ": "CONNESSIONE BLOCCATA",
+  "Calculator din lista de blocare": "Computer nell'elenco di blocco",
+  "Listă de blocare": "Elenco di blocco",
+  "Închide imediat conexiunile calculatoarelor din lista de blocare": "Chiudi subito le connessioni dei computer nell'elenco di blocco",
+  "Calculator (IP și/sau nume)": "Computer (IP e/o nome)",
+  "Adaugă": "Aggiungi",
+  "Șterge selectate": "Rimuovi selezionati",
+  "Deschide fișierul": "Apri file",
+  "Șterge din listă (deblochează)": "Rimuovi dall'elenco (sblocca)",
+  "IP și/sau nume de calculator, separate prin spațiu (ex.: 192.168.1.50 PC-BIROU). Lista e salvată în blocklist.txt, lângă executabil, și poate fi editată și direct; modificările se aplică în câteva secunde.": "IP e/o nome del computer, separati da spazi (es.: 192.168.1.50 PC-UFFICIO). L'elenco viene salvato in blocklist.txt, accanto all'eseguibile, e può essere modificato anche direttamente; le modifiche si applicano in pochi secondi.",
+  "adăugat manual {0}": "aggiunto manualmente {0}",
+  "blocat din Monitorizare {0}": "bloccato da Monitoraggio {0}",
+  "„{0}” este chiar acest calculator și nu poate fi blocat.": "«{0}» è questo computer e non può essere bloccato.",
+  "„{0}” este deja în lista de blocare.": "«{0}» è già nell'elenco di blocco.",
+  "Nu am putut scrie fișierul blocklist.txt.": "Impossibile scrivere il file blocklist.txt.",
+  "Blochează calculatorul": "Blocca computer",
+  "Ascunde partajările administrative (C$, ADMIN$ etc.) din liste": "Nascondi le condivisioni amministrative (C$, ADMIN$ ecc.) dagli elenchi",
+  "Notificare (fără sunet) când un calculator blocat este deconectat": "Notifica (senza suono) quando un computer bloccato viene disconnesso",
+  "Blochează și în Windows Firewall (porturile SMB 139 și 445): calculatorul nu se mai poate conecta deloc": "Blocca anche in Windows Firewall (porte SMB 139 e 445): il computer non può più connettersi",
+  "Se actualizează...": "Aggiornamento...",
+  "Elimină regulile ShareWatch din firewall": "Rimuovi le regole ShareWatch dal firewall",
+  "Elimini regula ShareWatch din Windows Firewall și oprești blocarea prin firewall? Lista de blocare rămâne neschimbată.": "Rimuovere la regola ShareWatch da Windows Firewall e interrompere il blocco tramite firewall? L'elenco di blocco resta invariato.",
+  "Eroare: {0}": "Errore: {0}",
+  "Activă, dar nu există adrese IP de blocat.": "Attivo, ma non ci sono indirizzi IP da bloccare.",
+  "Nicio regulă ShareWatch în firewall.": "Nessuna regola ShareWatch nel firewall.",
+  "Regulă activă: {0} adrese blocate ({1}).": "Regola attiva: {0} indirizzi bloccati ({1}).",
+  "Blochezi:\r\n{0}\r\n\r\nCalculatorul este deconectat acum și la fiecare încercare de conectare, până îl ștergi din lista de blocare (Opțiuni).": "Blocca:\r\n{0}\r\n\r\nIl computer viene disconnesso ora e a ogni tentativo di connessione, finché non lo rimuovi dall'elenco di blocco (Opzioni).",
+  "PARTAJARE": "CONDIVISIONE AGGIUNTA",
+  "ANULARE": "CONDIVISIONE RIMOSSA",
+  "Deconectează calculatorul": "Disconnetti computer",
+  "Deconectezi:\r\n{0}\r\n\r\nFișierele deschise de pe acest calculator se închid, iar datele nesalvate se pot pierde. Windows se poate reconecta automat la următoarea accesare.": "Disconnetti:\r\n{0}\r\n\r\nI file aperti da questo computer verranno chiusi e i dati non salvati potrebbero andare persi. Windows può riconnettersi automaticamente al prossimo accesso.",
+  "Acces refuzat - rulează aplicația ca Administrator.": "Accesso negato - esegui l'applicazione come amministratore.",
+  "Există deja o partajare cu acest nume.": "Esiste già una condivisione con questo nome.",
+  "Calea nu există sau nu este un folder local.": "Il percorso non esiste o non è una cartella locale.",
+  "Partajarea nu există.": "La condivisione non esiste.",
+  "Calculatorul nu mai este conectat.": "Il computer non è più connesso.",
+  "Parametru invalid (verifică numele partajării).": "Parametro non valido (controlla il nome della condivisione).",
+  "Eroare Windows: {0}": "Errore di Windows: {0}",
+  "Partajează un folder...": "Condividi una cartella...",
+  "Partajează un folder": "Condividi una cartella",
+  "Oprește partajarea": "Interrompi condivisione",
+  "Deschide folderul": "Apri cartella",
+  "Nu am putut partaja folderul.": "Impossibile condividere la cartella.",
+  " (citire și scriere)": " (lettura e scrittura)",
+  " (doar citire)": " (sola lettura)",
+  "Selectează o partajare obișnuită (nu administrativă) din listă.": "Seleziona dall'elenco una condivisione normale (non amministrativa).",
+  "Oprești partajarea pentru:\r\n{0}\r\n\r\nFolderul și fișierele rămân pe disc; doar nu mai sunt accesibile din rețea. Cine e conectat acum pierde accesul.": "Interrompere la condivisione di:\r\n{0}\r\n\r\nLa cartella e i file restano sul disco; semplicemente non sono più accessibili dalla rete. Chi è connesso ora perde l'accesso.",
+  "Răsfoiește...": "Sfoglia...",
+  "Folder:": "Cartella:",
+  "Nume partajare:": "Nome condivisione:",
+  "Descriere:": "Descrizione:",
+  "Doar citire": "Sola lettura",
+  "Citire și scriere": "Lettura e scrittura",
+  "Acces pentru toți (Everyone):": "Accesso per tutti (Everyone):",
+  "Permisiunile NTFS ale folderului se aplică în continuare. Pentru acces din rețea, utilizatorii au nevoie și de drept pe folder (fila Securitate).": "Le autorizzazioni NTFS della cartella continuano ad applicarsi. Per l'accesso di rete, gli utenti hanno bisogno anche di diritti sulla cartella (scheda Sicurezza).",
+  "Partajează": "Condividi",
+  "Anulează": "Annulla",
+  "Alege folderul de partajat": "Scegli la cartella da condividere",
+  "Alege un folder care există.": "Scegli una cartella esistente.",
+  "Folderul trebuie să fie pe acest calculator, nu în rețea.": "La cartella deve trovarsi su questo computer, non in rete.",
+  "Numele partajării trebuie să aibă între 1 și 80 de caractere.": "Il nome della condivisione deve avere da 1 a 80 caratteri.",
+  "Numele partajării conține caractere nepermise: \\ / [ ] : | < > + = ; , ? * \"": "Il nome della condivisione contiene caratteri non consentiti: \\ / [ ] : | < > + = ; , ? * \""
+}}/*END*/;
+
+const NAMES = { en: "English", ro: "Română" };
+const STORE = "sharewatch-translate";
+const $ = id => document.getElementById(id);
+
+// all keys, in the order of en.json (the template generated from the program)
+const KEYS = Object.keys(LANGS.en || {}).filter(k => !k.startsWith("_"));
+let tr = {};          // key -> translation (with \n line breaks)
+let areas = {};       // key -> textarea
+
+function placeholders(s) { return (s.match(/\{\d+\}/g) || []).sort().join(" "); }
+
+function sourceText(key) {
+  const src = $("source").value;
+  if (src === "ro") return { text: key, fb: false };
+  const lang = LANGS[src] || {};
+  if (lang[key]) return { text: lang[key], fb: false };
+  return { text: (LANGS.en || {})[key] || key, fb: src !== "en" };
+}
+
+function esc(s) { return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+function markPh(s) { return esc(s).replace(/\{\d+\}/g, m => '<span class="ph">' + m + "</span>"); }
+
+function fit(ta) { ta.style.height = "auto"; ta.style.height = (ta.scrollHeight + 2) + "px"; }
+
+function build() {
+  const list = $("list");
+  list.innerHTML = "";
+  areas = {};
+  for (const key of KEYS) {
+    const s = sourceText(key);
+    const div = document.createElement("div");
+    div.className = "item";
+    div.innerHTML = '<div class="src">' + markPh(s.text.replace(/\r\n/g, "\n")) +
+      (s.fb ? '<span class="fb">(English, missing in this language)</span>' : "") + "</div>" +
+      '<textarea rows="1" spellcheck="true"></textarea><div class="warn"></div>';
+    const ta = div.querySelector("textarea");
+    ta.value = tr[key] || "";
+    ta.addEventListener("input", () => { tr[key] = ta.value; fit(ta); check(key); save(); progress(); });
+    areas[key] = ta;
+    list.appendChild(div);
+    check(key);
+  }
+  requestAnimationFrame(() => Object.values(areas).forEach(fit));
+  progress();
+}
+
+function check(key) {
+  const ta = areas[key];
+  const div = ta.parentElement;
+  const v = ta.value.trim();
+  div.classList.toggle("done", v.length > 0);
+  const need = placeholders((LANGS.en || {})[key] || key);
+  const w = div.querySelector(".warn");
+  const bad = v.length > 0 && placeholders(v) !== need;
+  w.classList.toggle("on", bad);
+  w.textContent = bad ? "Must contain exactly: " + need : "";
+  div.classList.toggle("hidden", $("onlyEmpty").checked && v.length > 0 && document.activeElement !== ta);
+}
+
+function progress() {
+  const n = KEYS.filter(k => (tr[k] || "").trim()).length;
+  $("prog").style.width = (KEYS.length ? 100 * n / KEYS.length : 0) + "%";
+  $("count").textContent = n + " / " + KEYS.length + " translated";
+}
+
+function header() {
+  const code = $("code").value.trim().toLowerCase();
+  const name = $("name").value.trim();
+  const t = $("target");
+  if (code) {
+    t.textContent = "→ " + code.toUpperCase() + (name ? " · " + name : "");
+    t.classList.remove("empty");
+  } else {
+    t.textContent = "enter the language code below";
+    t.classList.add("empty");
+  }
+}
+
+// pastrare in browser (unele moduri de deschidere nu permit localStorage: pagina merge si fara)
+function storeGet() { try { return localStorage.getItem(STORE); } catch (e) { return null; } }
+function storeSet(v) { try { if (v === null) localStorage.removeItem(STORE); else localStorage.setItem(STORE, v); } catch (e) { } }
+
+function save() {
+  storeSet(JSON.stringify({
+    code: $("code").value, name: $("name").value, author: $("author").value, source: $("source").value, tr
+  }));
+}
+
+function restore() {
+  try {
+    const d = JSON.parse(storeGet() || "null");
+    if (!d) return;
+    $("code").value = d.code || ""; $("name").value = d.name || ""; $("author").value = d.author || "";
+    if (d.source && LANGS[d.source] !== undefined || d.source === "ro") $("source").value = d.source;
+    tr = d.tr || {};
+  } catch (e) { }
+}
+
+function download() {
+  const code = $("code").value.trim().toLowerCase();
+  const msg = $("msg");
+  msg.textContent = "";
+  if (!/^[a-z]{2,3}$/.test(code)) { msg.textContent = "Enter the language code: 2 letters, e.g. pl, nl, pt."; $("code").focus(); return; }
+  if (code === "ro" || code === "en") { msg.textContent = "Romanian and English are built into ShareWatch; choose another code."; $("code").focus(); return; }
+  const bad = KEYS.filter(k => (tr[k] || "").trim() && placeholders(tr[k]) !== placeholders((LANGS.en || {})[k] || k));
+  if (bad.length && !confirm(bad.length + " text(s) have wrong {0}/{1} markers. ShareWatch will show those in English. Download anyway?")) return;
+  const name = $("name").value.trim() || code;
+  const out = { _name: name };
+  const author = $("author").value.trim();
+  out._info = "ShareWatch translation: " + name + ". Keys are the Romanian texts; translate only the values.";
+  if (author) out._author = author;
+  for (const k of KEYS) {
+    let v = (tr[k] || "").trim();
+    if (!v) continue;
+    const en = (LANGS.en || {})[k] || "";
+    if (en.includes("\r\n")) v = v.replace(/\r?\n/g, "\r\n");
+    out[k] = v;
+  }
+  const blob = new Blob([JSON.stringify(out, null, 2) + "\n"], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = code + ".json";
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+function openFile(f) {
+  const r = new FileReader();
+  r.onload = () => {
+    try {
+      const d = JSON.parse(r.result);
+      const code = f.name.replace(/\.json$/i, "").toLowerCase();
+      if (/^[a-z]{2,3}$/.test(code)) $("code").value = code;
+      if (d._name) $("name").value = d._name;
+      if (d._author) $("author").value = d._author;
+      tr = {};
+      for (const k of KEYS) if (typeof d[k] === "string") tr[k] = d[k].replace(/\r\n/g, "\n");
+      $("msg").textContent = "";
+      header(); build(); save();
+    } catch (e) { $("msg").textContent = "This file is not valid JSON."; }
+  };
+  r.readAsText(f, "utf-8");
+}
+
+// ---- start
+const sel = $("source");
+const codes = Object.keys(LANGS).filter(c => c !== "en").sort((a, b) => (LANGS[a]._name || a).localeCompare(LANGS[b]._name || b));
+for (const c of ["en", "ro", ...codes]) {
+  const o = document.createElement("option");
+  o.value = c;
+  o.textContent = c === "ro" ? NAMES.ro : (LANGS[c] && LANGS[c]._name) || NAMES[c] || c;
+  sel.appendChild(o);
+}
+sel.value = "en";
+restore();
+header();
+build();
+
+sel.addEventListener("change", () => { save(); build(); });
+$("code").addEventListener("input", () => { header(); save(); });
+$("name").addEventListener("input", () => { header(); save(); });
+$("author").addEventListener("input", save);
+$("onlyEmpty").addEventListener("change", () => KEYS.forEach(check));
+$("save").addEventListener("click", download);
+$("open").addEventListener("click", () => $("file").click());
+$("file").addEventListener("change", e => { if (e.target.files[0]) openFile(e.target.files[0]); e.target.value = ""; });
+$("clear").addEventListener("click", () => {
+  if (!confirm("Delete all translations typed on this page?")) return;
+  tr = {}; $("code").value = ""; $("name").value = ""; $("author").value = "";
+  storeSet(null); header(); build();
+});
+</script>
+</body>
+</html>

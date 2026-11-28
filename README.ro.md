@@ -49,7 +49,14 @@ language\
 
 Fișiere de limbă gata făcute se află în folderul [`language`](language): **Deutsch** (`de.json`), **Français** (`fr.json`), **Italiano** (`it.json`) și **Español** (`es.json`). Copiază-le pe cele dorite într-un folder `language` lângă executabil.
 
-Pentru a adăuga altă limbă:
+Cel mai simplu adaugi o limbă nouă cu **`language/translate.html`** (inclus și în arhiva din release). Deschide-l într-un browser; nu e nevoie de internet sau de server:
+
+1. Completează codul limbii (de ex. `pl`), numele limbii așa cum va apărea în Opțiuni (de ex. `Polski`) și, dacă vrei, numele tău ca traducător.
+2. Alege limba din care traduci (implicit engleza, sau româna, germana, franceza, italiana, spaniola).
+3. Scrie traducerea sub fiecare text. Marcajele de tipul `{0}` trebuie păstrate; pagina te avertizează dacă lipsește unul. Lucrul tău rămâne salvat în browser până apeși **Clear**, iar **Open file…** încarcă un `xx.json` existent, ca să-l continui sau să-l corectezi.
+4. Apasă **Download .json**, pune fișierul în folderul `language` de lângă `ShareWatch.exe`, repornește ShareWatch și alege limba din Opțiuni → Limbă.
+
+Sau manual:
 
 1. Copiază [`language/en.json`](language/en.json) cu numele `xx.json`, unde `xx` este codul limbii din două litere (`de.json`, `fr.json` etc.).
 2. Completează `_name` cu numele limbii, așa cum va apărea în Opțiuni (de ex. `Deutsch`).
@@ -136,6 +143,8 @@ Salvează câte un PNG pentru fiecare tab și pentru două notificări (una obi�
 | `source/build.ps1` | Scriptul de compilare |
 | `source/app.manifest` | Manifestul de administrator |
 | `language/` | Fișierele de limbă (`en.json` este modelul) |
+| `language/translate.html` | Pagina de traducere (se deschide în browser) |
+| `source/translate-data.ps1` | Copiază fișierele de limbă în `translate.html` (rulat de `build.ps1`) |
 
 ## Modificări
 
